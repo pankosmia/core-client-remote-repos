@@ -6,11 +6,13 @@
   "i18n": {
     "title": {
       "en": "Resources on Servers",
-      "fr": "Ressources sur Serveur"
+      "fr": "Ressources sur Serveur",
+      "id": "Sumber Daya di Server"
     },
     "summary": {
       "en": "Search and download remote resources from Pankosmia servers.",
-      "fr": "Chercher et télécharger des ressources depuis des serveurs Pankosmia."
+      "fr": "Chercher et télécharger des ressources depuis des serveurs Pankosmia.",
+      "id": "Cari dan unduh sumber daya jarak jauh dari server-server Pankosmia."
     }
   }
 }
