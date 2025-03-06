@@ -9,7 +9,7 @@
     "@mui/icons-material": "^6.1.5",
     "@mui/material": "^6.1.5",
     "eslint-config-react-app": "^7.0.1",
-    "pithekos-lib": "^0.5.2",
+    "pithekos-lib": "^0.5.11",
     "react": "^17.0.0 || ^18.0.0",
     "react-dom": "^17.0.0 || ^18.0.0"
   },
