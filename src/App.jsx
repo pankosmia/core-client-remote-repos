@@ -1,16 +1,29 @@
-import {useState, useEffect} from "react"
+import {useState, useEffect, useCallback} from "react"
 import {Button, ButtonGroup, Grid2} from "@mui/material";
 import {CloudDownload, CloudDone} from "@mui/icons-material";
 import {enqueueSnackbar} from "notistack";
 import {getAndSetJson, getJson} from "pithekos-lib";
 
 function App() {
+
+    const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - 64);
+
+    const handleWindowResize = useCallback(() => {
+        setMaxWindowHeight(window.innerHeight - 64);
+    }, []);
+
+    useEffect(() => {
+        window.addEventListener('resize', handleWindowResize);
+        return () => {
+            window.removeEventListener('resize', handleWindowResize);
+        };
+    }, [handleWindowResize]);
+
     const sourceWhitelist = [
         ["git.door43.org/BurritoTruck", "Burrito Truck (Door43)"],
         ["git.door43.org/uW", "unfoldingWord Burritos (Door43)"],
     ];
     const [remoteSource, setRemoteSource] = useState(sourceWhitelist[0]);
-    console.log(remoteSource);
     const [catalog, setCatalog] = useState([]);
     useEffect(
         () => {
@@ -34,7 +47,7 @@ function App() {
     );
 
     return (
-        <Grid2 container spacing={2}>
+        <Grid2 container spacing={1} sx={{maxHeight: maxWindowHeight}}>
             <Grid2 container>
                 <Grid2 item size={12}>
                     <ButtonGroup>
