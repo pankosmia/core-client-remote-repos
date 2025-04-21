@@ -15,6 +15,18 @@
       "en": "Search and download remote resources from Pankosmia servers.",
       "fr": "Chercher et télécharger des ressources depuis des serveurs Pankosmia.",
       "id": "Cari dan unduh sumber daya jarak jauh dari server-server Pankosmia."
+    },
+    "downloaded": {
+      "en": "has been downloaded",
+      "es": "fue descargado"
+    },
+    "downloading": {
+      "en": "Downloading",
+      "es": "Descargando"
+    },
+    "failed_to_download": {
+      "en": "has failed to download",
+      "es": "no se pudo descargar"
     }
   }
 }

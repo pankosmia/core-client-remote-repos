@@ -1,10 +1,12 @@
-import {useState, useEffect, useCallback} from "react"
+import {useState, useEffect, useCallback, useContext} from "react"
 import {Button, ButtonGroup, Grid2} from "@mui/material";
 import {CloudDownload, CloudDone} from "@mui/icons-material";
 import {enqueueSnackbar} from "notistack";
-import {getAndSetJson, getJson} from "pithekos-lib";
+import {getAndSetJson, getJson, i18nContext, doI18n} from "pithekos-lib";
 
 function App() {
+
+    const {i18nRef} = useContext(i18nContext);
 
     const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - 64);
 
@@ -90,19 +92,19 @@ function App() {
                                                     disabled={localRepos.includes(remoteRepoPath)}
                                                     onClick={async () => {
                                                         enqueueSnackbar(
-                                                            `Downloading ${ce.abbreviation}`,
+                                                            `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${ce.abbreviation}`,
                                                             {variant: "info"}
                                                         );
                                                         const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
                                                         if (fetchResponse.ok) {
                                                             enqueueSnackbar(
-                                                                `${ce.abbreviation} downloaded`,
+                                                                `${ce.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
                                                                 {variant: "success"}
                                                             );
                                                             setRemoteSource([...remoteSource]) // Trigger local repo check
                                                         } else {
                                                             enqueueSnackbar(
-                                                                `${ce.abbreviation} failed`,
+                                                                `${ce.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
                                                                 {variant: "error"}
                                                             );
                                                         }
