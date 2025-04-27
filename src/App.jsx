@@ -38,6 +38,15 @@ function App() {
     );
 
     const [localRepos, setLocalRepos] = useState([]);
+
+    const flavorTypes = {
+        textTranslation: "scripture",
+        "x-bcvNotes": "parascriptural",
+        "x-bcvArticles": "parascriptural",
+        "x-bcvQuestions": "parascriptural",
+        "x-bcvImages": "parascriptural"
+    };
+
     useEffect(
         () => {
             getAndSetJson({
@@ -82,7 +91,9 @@ function App() {
                                         {ce.description}
                                     </Grid2>
                                     <Grid2 item size={3}>
-                                        {`${ce.flavor_type}/${ce.flavor}`}
+                                        {
+                                            doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
+                                        }
                                     </Grid2>
                                     <Grid2 item size={1}>
                                         {
