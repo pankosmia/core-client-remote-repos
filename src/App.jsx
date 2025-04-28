@@ -1,5 +1,5 @@
 import {useState, useEffect, useCallback, useContext} from "react"
-import {Button, ButtonGroup, Grid2} from "@mui/material";
+import {Box, Button, ButtonGroup, Grid2} from "@mui/material";
 import {CloudDownload, CloudDone} from "@mui/icons-material";
 import {enqueueSnackbar} from "notistack";
 import {getAndSetJson, getJson, i18nContext, doI18n} from "pithekos-lib";
@@ -39,14 +39,6 @@ function App() {
 
     const [localRepos, setLocalRepos] = useState([]);
 
-    const flavorTypes = {
-        textTranslation: "scripture",
-        "x-bcvNotes": "parascriptural",
-        "x-bcvArticles": "parascriptural",
-        "x-bcvQuestions": "parascriptural",
-        "x-bcvImages": "parascriptural"
-    };
-
     useEffect(
         () => {
             getAndSetJson({
@@ -58,78 +50,80 @@ function App() {
     );
 
     return (
-        <Grid2 container spacing={1} sx={{maxHeight: maxWindowHeight}}>
-            <Grid2 container>
-                <Grid2 item size={12}>
-                    <ButtonGroup>
-                        {
-                            sourceWhitelist.map(
-                                s => <Button
-                                    variant={s[0] === remoteSource[0] ? "contained" : "outlined"}
-                                    onClick={() => setRemoteSource(s)}
-                                >
-                                    {s[1]}
-                                </Button>
-                            )
-                        }
-                    </ButtonGroup>
-                </Grid2>
-                {
-                    catalog
-                        .filter(ce => ce.flavor)
-                        .map(
-                            ce => {
-                                const remoteRepoPath = `${remoteSource[0]}/${ce.name}`;
-                                return <>
-                                    <Grid2 item size={1}>
-                                        {ce.abbreviation.toUpperCase()}
-                                    </Grid2>
-                                    <Grid2 item size={1}>
-                                        {ce.language_code}
-                                    </Grid2>
-                                    <Grid2 item size={6}>
-                                        {ce.description}
-                                    </Grid2>
-                                    <Grid2 item size={3}>
-                                        {
-                                            doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
-                                        }
-                                    </Grid2>
-                                    <Grid2 item size={1}>
-                                        {
-                                            localRepos.includes(remoteRepoPath) ?
-                                                <CloudDone color="disabled"/> :
-                                                <CloudDownload
-                                                    disabled={localRepos.includes(remoteRepoPath)}
-                                                    onClick={async () => {
-                                                        enqueueSnackbar(
-                                                            `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${ce.abbreviation}`,
-                                                            {variant: "info"}
-                                                        );
-                                                        const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
-                                                        if (fetchResponse.ok) {
-                                                            enqueueSnackbar(
-                                                                `${ce.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
-                                                                {variant: "success"}
-                                                            );
-                                                            setRemoteSource([...remoteSource]) // Trigger local repo check
-                                                        } else {
-                                                            enqueueSnackbar(
-                                                                `${ce.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
-                                                                {variant: "error"}
-                                                            );
-                                                        }
-                                                    }
-                                                    }
-                                                />
-                                        }
-                                    </Grid2>
-                                </>
+        <Box sx={{p: 0, m:0}}>
+            <Grid2 container spacing={1} sx={{maxHeight: maxWindowHeight}}>
+                <Grid2 container>
+                    <Grid2 item size={12}>
+                        <ButtonGroup>
+                            {
+                                sourceWhitelist.map(
+                                    s => <Button
+                                        variant={s[0] === remoteSource[0] ? "contained" : "outlined"}
+                                        onClick={() => setRemoteSource(s)}
+                                    >
+                                        {s[1]}
+                                    </Button>
+                                )
                             }
-                        )
-                }
+                        </ButtonGroup>
+                    </Grid2>
+                    {
+                        catalog
+                            .filter(ce => ce.flavor)
+                            .map(
+                                ce => {
+                                    const remoteRepoPath = `${remoteSource[0]}/${ce.name}`;
+                                    return <>
+                                        <Grid2 item size={1}>
+                                            {ce.abbreviation.toUpperCase()}
+                                        </Grid2>
+                                        <Grid2 item size={1}>
+                                            {ce.language_code}
+                                        </Grid2>
+                                        <Grid2 item size={6}>
+                                            {ce.description}
+                                        </Grid2>
+                                        <Grid2 item size={3}>
+                                            {
+                                                doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
+                                            }
+                                        </Grid2>
+                                        <Grid2 item size={1}>
+                                            {
+                                                localRepos.includes(remoteRepoPath) ?
+                                                    <CloudDone color="disabled"/> :
+                                                    <CloudDownload
+                                                        disabled={localRepos.includes(remoteRepoPath)}
+                                                        onClick={async () => {
+                                                            enqueueSnackbar(
+                                                                `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${ce.abbreviation}`,
+                                                                {variant: "info"}
+                                                            );
+                                                            const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
+                                                            if (fetchResponse.ok) {
+                                                                enqueueSnackbar(
+                                                                    `${ce.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
+                                                                    {variant: "success"}
+                                                                );
+                                                                setRemoteSource([...remoteSource]) // Trigger local repo check
+                                                            } else {
+                                                                enqueueSnackbar(
+                                                                    `${ce.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
+                                                                    {variant: "error"}
+                                                                );
+                                                            }
+                                                        }
+                                                        }
+                                                    />
+                                            }
+                                        </Grid2>
+                                    </>
+                                }
+                            )
+                    }
+                </Grid2>
             </Grid2>
-        </Grid2>
+        </Box>
     );
 }
 
