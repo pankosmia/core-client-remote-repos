@@ -8,10 +8,10 @@ function App() {
 
     const {i18nRef} = useContext(i18nContext);
 
-    const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - 64);
+    const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - 48);
 
     const handleWindowResize = useCallback(() => {
-        setMaxWindowHeight(window.innerHeight - 64);
+        setMaxWindowHeight(window.innerHeight - 48);
     }, []);
 
     useEffect(() => {
