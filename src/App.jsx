@@ -51,9 +51,9 @@ function App() {
 
     return (
         <Box sx={{p: 0, m:0}}>
-            <Grid2 container spacing={1} sx={{maxHeight: maxWindowHeight}}>
+            <Grid2 container spacing={1} sx={{maxHeight: maxWindowHeight, m:0}}>
                 <Grid2 container>
-                    <Grid2 item size={12}>
+                    <Grid2 item size={12} sx={{m:0}}>
                         <ButtonGroup>
                             {
                                 sourceWhitelist.map(
