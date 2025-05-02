@@ -1,5 +1,5 @@
 import {useState, useEffect, useCallback, useContext} from "react"
-import {Box, Button, ButtonGroup, Grid2} from "@mui/material";
+import {Box, Button, ButtonGroup, Grid2, CircularProgress} from "@mui/material";
 import {CloudDownload, CloudDone} from "@mui/icons-material";
 import {enqueueSnackbar} from "notistack";
 import {getAndSetJson, getJson, i18nContext, doI18n} from "pithekos-lib";
@@ -68,7 +68,7 @@ function App() {
                         </ButtonGroup>
                     </Grid2>
                     {
-                        catalog
+                        catalog.length > 0 && catalog
                             .filter(ce => ce.flavor)
                             .map(
                                 ce => {
@@ -120,6 +120,9 @@ function App() {
                                     </>
                                 }
                             )
+                    }
+                    {
+                        catalog.length === 0 && <CircularProgress/>
                     }
                 </Grid2>
             </Grid2>
