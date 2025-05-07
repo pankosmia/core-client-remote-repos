@@ -3,6 +3,8 @@
   "require": {
     "net": true
   },
+  "exclude_from_menu": true,
+  "exclude_from_dashboard": true,
   "i18n": {
     "title": {
       "ar": "موارد للتنزيل",
