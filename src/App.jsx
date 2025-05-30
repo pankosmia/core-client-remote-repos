@@ -27,6 +27,7 @@ function App() {
     ];
     const [remoteSource, setRemoteSource] = useState(sourceWhitelist[0]);
     const [catalog, setCatalog] = useState([]);
+    const [language, setLanguage] = useState("");
     useEffect(
         () => {
             getAndSetJson({
@@ -49,6 +50,15 @@ function App() {
         [remoteSource]
     );
 
+    const languages = Array.from(
+        new Set(
+            (catalog || [])
+        .map(cv => cv.language_code)
+        )
+    )
+        .filter(l => l)
+        .sort();
+
     return (
         <Box sx={{p: 0, m:0, maxHeight: maxWindowHeight}}>
             <Grid2 container spacing={1} sx={{m:0}}>
@@ -67,9 +77,32 @@ function App() {
                             }
                         </ButtonGroup>
                     </Grid2>
+                    <Grid2 item size={12}>
+                        <ButtonGroup>
+                            <Button
+                                onClick={() => setLanguage("")}
+                                variant={language === "" ? "contained": "outlined"}
+                                color="secondary"
+                            >
+                                *
+                            </Button>
+                            {
+                                languages
+                                    .map(
+                                        ce => <Button
+                                            onClick={() => setLanguage(ce)}
+                                            variant={language === ce ? "contained": "outlined"}
+                                            color="secondary"
+                                        >
+                                            {ce}
+                                        </Button>
+                                    )
+                            }
+                        </ButtonGroup>
+                    </Grid2>
                     {
                         catalog.length > 0 && catalog
-                            .filter(ce => ce.flavor)
+                            .filter(ce => ce.flavor && (language === "" || language === ce.language_code))
                             .map(
                                 ce => {
                                     const remoteRepoPath = `${remoteSource[0]}/${ce.name}`;
