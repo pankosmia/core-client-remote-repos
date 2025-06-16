@@ -1,5 +1,7 @@
 import {useState, useEffect, useCallback, useContext} from "react"
-import {Box, Button, ButtonGroup, Grid2, CircularProgress} from "@mui/material";
+import {Box, Button, ButtonGroup, Grid2, CircularProgress, Typography} from "@mui/material";
+import {DataGrid} from '@mui/x-data-grid';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {CloudDownload, CloudDone} from "@mui/icons-material";
 import {enqueueSnackbar} from "notistack";
 import {getAndSetJson, getJson, i18nContext, doI18n} from "pithekos-lib";
@@ -59,6 +61,98 @@ function App() {
         .filter(l => l)
         .sort();
 
+    const columns = [
+        {
+            field: 'resourceCode',
+            headerName: <Typography>{doI18n("pages:core-remote-resources:row_resource_code", i18nRef.current)}</Typography>,
+            flex: 0.5
+        },
+        {
+            field: 'language',
+            headerName: <Typography>{doI18n("pages:core-remote-resources:row_language", i18nRef.current)}</Typography>,
+            flex: 0.5
+        },
+        {
+            field: 'description',
+            headerName: <Typography>{doI18n("pages:core-remote-resources:row_description", i18nRef.current)}</Typography>,
+            type: "number",
+            flex: 2
+        },
+        {
+            field: 'type',
+            headerName: <Typography>{doI18n("pages:core-remote-resources:row_type", i18nRef.current)}</Typography>,
+            flex: 1.5
+        },
+        {
+            field: 'download',
+            headerName: <Typography>{doI18n("pages:core-remote-resources:row_download", i18nRef.current)}</Typography>,
+            flex: 0.5,
+            
+            renderCell: (params) => {
+
+                const remoteRepoPath = `${remoteSource[0]}/${params.row.name}`;
+
+                return localRepos.includes(remoteRepoPath) ?
+                    <CloudDone color="disabled"/> :
+                    <CloudDownload
+                        disabled={localRepos.includes(remoteRepoPath)}
+                        onClick={async () => {
+                            enqueueSnackbar(
+                                `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
+                                {variant: "info"}
+                            );
+                            const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
+                            if (fetchResponse.ok) {
+                                enqueueSnackbar(
+                                    `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
+                                    {variant: "success"}
+                                );
+                                setRemoteSource([...remoteSource]) // Trigger local repo check
+                            } else {
+                                enqueueSnackbar(
+                                    `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
+                                    {variant: "error"}
+                                );
+                            }
+                        }
+                        }
+                    />;
+                }
+        }
+    ]
+
+/*     const rows2 = repos.map((rep, n) => {
+        return {
+            ...rep,
+            id: n,
+            name: `${rep.name.trim()}${rep.description.trim() !== rep.name.trim() ? ": " + rep.description.trim() : ""}`,
+            language: rep.language_code,
+            nBooks: rep.bookCodes.length,
+            type: rep.flavor,
+            source: rep.path.startsWith("_local_") ?
+                doI18n("pages:content:local_org", i18nRef.current) :
+                `${rep.path.split("/")[1]} (${rep.path.split("/")[0]})`,
+            dateUpdated: rep.generated_date,
+        }
+    }); */
+
+    const rows = catalog.filter(ce => ce.flavor && (language === "" || language === ce.language_code)).map((ce, n) => {
+        return {
+            ...ce,
+            id: n,
+            resourceCode: ce.abbreviation.toUpperCase(),
+            language: ce.language_code,
+            description: ce.description,
+            type: doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
+        }
+    })
+
+    const theme = createTheme({
+        typography: {
+          fontSize: 18,
+        },
+      });
+
     return (
         <Box sx={{p: 0, maxHeight: maxWindowHeight, mb: '16px' }} style={{position: 'fixed', top: '80px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
             <Box sx={{ml: '16px'}}>
@@ -102,6 +196,16 @@ function App() {
                             </ButtonGroup>
                         </Grid2>
                         {
+                            catalog.length > 0 && <ThemeProvider theme={theme}>
+                                <DataGrid
+                                    rows={rows}
+                                    columns={columns}
+                                    sx={{ fontSize: "1rem" }}
+                                />
+                            </ThemeProvider>
+                        }
+
+                        {/* {
                             catalog.length > 0 && catalog
                                 .filter(ce => ce.flavor && (language === "" || language === ce.language_code))
                                 .map(
@@ -154,7 +258,7 @@ function App() {
                                         </>
                                     }
                                 )
-                        }
+                        } */}
                         {
                             catalog.length === 0 && <CircularProgress/>
                         }
