@@ -33,27 +33,27 @@
       "es": "no se pudo descargar",
       "fr": "n'a pas pu être téléchargé"
     },
-    "resourceCode": {
+    "row_resource_code": {
       "en": "Resource Code",
       "es": "Código de Recurso",
       "fr": "Code Ressource"
     },
-    "language": {
+    "row_language": {
       "en": "Language",
       "es": "Idioma",
       "fr": "Langue"
     },
-    "description": {
+    "row_description": {
       "en": "Description",
       "es": "Descripción",
       "fr": "Description"
     },
-    "type": {
+    "row_type": {
       "en": "Type",
       "es": "Tipo",
       "fr": "Type"
     },
-    "download": {
+    "row_download": {
       "en": "Download",
       "es": "Descargar",
       "fr": "Télécharger"
