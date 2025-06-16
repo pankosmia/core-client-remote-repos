@@ -3,11 +3,18 @@ import {Box, Button, ButtonGroup, Grid2, CircularProgress, Typography} from "@mu
 import {DataGrid} from '@mui/x-data-grid';
 import {CloudDownload, CloudDone} from "@mui/icons-material";
 import {enqueueSnackbar} from "notistack";
-import {getAndSetJson, getJson, i18nContext, doI18n} from "pithekos-lib";
+import {getAndSetJson, getJson, i18nContext, doI18n, typographyContext} from "pithekos-lib";
+import GraphiteTest from "./GraphiteTest";
+
 
 function App() {
 
+    const { typographyRef } = useContext(typographyContext);
     const {i18nRef} = useContext(i18nContext);
+
+    const isGraphite = GraphiteTest()
+    /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
+    const adjSelectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
 
     const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - 80);
 
@@ -144,62 +151,64 @@ function App() {
     })
 
     return (
-        <Box sx={{p: 0, maxHeight: maxWindowHeight, mb: '16px' }} style={{position: 'fixed', top: '80px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
-            <Box sx={{ml: '16px'}}>
-                <Grid2 container spacing={1} sx={{m:0}}>
-                    <Grid2 container>
-                        <Grid2 item size={12} sx={{m:0}}>
-                            <ButtonGroup>
-                                {
-                                    sourceWhitelist.map(
-                                        s => <Button
-                                            variant={s[0] === remoteSource[0] ? "contained" : "outlined"}
-                                            onClick={() => setRemoteSource(s)}
-                                        >
-                                            {s[1]}
-                                        </Button>
-                                    )
-                                }
-                            </ButtonGroup>
-                        </Grid2>
-                        <Grid2 item size={12}>
-                            <ButtonGroup>
-                                <Button
-                                    onClick={() => setLanguage("")}
-                                    variant={language === "" ? "contained": "outlined"}
-                                    color="secondary"
-                                >
-                                    *
-                                </Button>
-                                {
-                                    languages
-                                        .map(
-                                            ce => <Button
-                                                onClick={() => setLanguage(ce)}
-                                                variant={language === ce ? "contained": "outlined"}
-                                                color="secondary"
+        <div className={adjSelectedFontClass}>
+            <Box sx={{p: 0, maxHeight: maxWindowHeight, mb: '16px' }} style={{position: 'fixed', top: '80px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
+                <Box sx={{ml: '16px'}}>
+                    <Grid2 container spacing={1} sx={{m:0}}>
+                        <Grid2 container>
+                            <Grid2 item size={12} sx={{m:0}}>
+                                <ButtonGroup>
+                                    {
+                                        sourceWhitelist.map(
+                                            s => <Button
+                                                variant={s[0] === remoteSource[0] ? "contained" : "outlined"}
+                                                onClick={() => setRemoteSource(s)}
                                             >
-                                                {ce}
+                                                {s[1]}
                                             </Button>
                                         )
-                                }
-                            </ButtonGroup>
+                                    }
+                                </ButtonGroup>
+                            </Grid2>
+                            <Grid2 item size={12}>
+                                <ButtonGroup>
+                                    <Button
+                                        onClick={() => setLanguage("")}
+                                        variant={language === "" ? "contained": "outlined"}
+                                        color="secondary"
+                                    >
+                                        *
+                                    </Button>
+                                    {
+                                        languages
+                                            .map(
+                                                ce => <Button
+                                                    onClick={() => setLanguage(ce)}
+                                                    variant={language === ce ? "contained": "outlined"}
+                                                    color="secondary"
+                                                >
+                                                    {ce}
+                                                </Button>
+                                            )
+                                    }
+                                </ButtonGroup>
+                            </Grid2>
+                            {
+                                catalog.length > 0 && 
+                                    <DataGrid
+                                        rows={rows}
+                                        columns={columns}
+                                        sx={{ fontSize: "1rem" }}
+                                    />
+                            }
+                            {
+                                catalog.length === 0 && <CircularProgress/>
+                            }
                         </Grid2>
-                        {
-                            catalog.length > 0 && 
-                                <DataGrid
-                                    rows={rows}
-                                    columns={columns}
-                                    sx={{ fontSize: "1rem" }}
-                                />
-                        }
-                        {
-                            catalog.length === 0 && <CircularProgress/>
-                        }
                     </Grid2>
-                </Grid2>
+                </Box>
             </Box>
-        </Box>
+        </div>
     );
 }
 
