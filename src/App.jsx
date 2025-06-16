@@ -60,6 +60,7 @@ function App() {
         .filter(l => l)
         .sort();
 
+    // Columns for the Data Grid
     const columns = [
         {
             field: 'resourceCode',
@@ -130,6 +131,7 @@ function App() {
         }
     ]
 
+    // Rows for the Data Grid
     const rows = catalog.filter(ce => ce.flavor && (language === "" || language === ce.language_code)).map((ce, n) => {
         return {
             ...ce,
@@ -191,61 +193,6 @@ function App() {
                                     sx={{ fontSize: "1rem" }}
                                 />
                         }
-
-                        {/* {
-                            catalog.length > 0 && catalog
-                                .filter(ce => ce.flavor && (language === "" || language === ce.language_code))
-                                .map(
-                                    ce => {
-                                        const remoteRepoPath = `${remoteSource[0]}/${ce.name}`;
-                                        return <>
-                                            <Grid2 item size={1}>
-                                                {ce.abbreviation.toUpperCase()}
-                                            </Grid2>
-                                            <Grid2 item size={1}>
-                                                {ce.language_code}
-                                            </Grid2>
-                                            <Grid2 item size={6}>
-                                                {ce.description}
-                                            </Grid2>
-                                            <Grid2 item size={3}>
-                                                {
-                                                    doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
-                                                }
-                                            </Grid2>
-                                            <Grid2 item size={1}>
-                                                {
-                                                    localRepos.includes(remoteRepoPath) ?
-                                                        <CloudDone color="disabled"/> :
-                                                        <CloudDownload
-                                                            disabled={localRepos.includes(remoteRepoPath)}
-                                                            onClick={async () => {
-                                                                enqueueSnackbar(
-                                                                    `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${ce.abbreviation}`,
-                                                                    {variant: "info"}
-                                                                );
-                                                                const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
-                                                                if (fetchResponse.ok) {
-                                                                    enqueueSnackbar(
-                                                                        `${ce.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
-                                                                        {variant: "success"}
-                                                                    );
-                                                                    setRemoteSource([...remoteSource]) // Trigger local repo check
-                                                                } else {
-                                                                    enqueueSnackbar(
-                                                                        `${ce.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
-                                                                        {variant: "error"}
-                                                                    );
-                                                                }
-                                                            }
-                                                            }
-                                                        />
-                                                }
-                                            </Grid2>
-                                        </>
-                                    }
-                                )
-                        } */}
                         {
                             catalog.length === 0 && <CircularProgress/>
                         }
