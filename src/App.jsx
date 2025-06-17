@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback, useContext} from "react"
+import {useState, useEffect, useContext} from "react"
 import {Box, Button, ButtonGroup, Grid2, CircularProgress} from "@mui/material";
 import {CloudDownload, CloudDone} from "@mui/icons-material";
 import {enqueueSnackbar} from "notistack";
@@ -7,19 +7,6 @@ import {getAndSetJson, getJson, i18nContext, doI18n} from "pithekos-lib";
 function App() {
 
     const {i18nRef} = useContext(i18nContext);
-
-    const [maxWindowHeight, setMaxWindowHeight] = useState(window.innerHeight - 80);
-
-    const handleWindowResize = useCallback(() => {
-        setMaxWindowHeight(window.innerHeight - 80);
-    }, []);
-
-    useEffect(() => {
-        window.addEventListener('resize', handleWindowResize);
-        return () => {
-            window.removeEventListener('resize', handleWindowResize);
-        };
-    }, [handleWindowResize]);
 
     const sourceWhitelist = [
         ["git.door43.org/BurritoTruck", "Burrito Truck (Door43)"],
