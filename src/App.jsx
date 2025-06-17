@@ -151,64 +151,62 @@ function App() {
     })
 
     return (
-        <div className={adjSelectedFontClass}>
-            <Box sx={{p: 0, maxHeight: maxWindowHeight, mb: '16px' }} style={{position: 'fixed', top: '80px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
-                <Box sx={{ml: '16px'}}>
-                    <Grid2 container spacing={1} sx={{m:0}}>
-                        <Grid2 container>
-                            <Grid2 item size={12} sx={{m:0}}>
-                                <ButtonGroup>
-                                    {
-                                        sourceWhitelist.map(
-                                            s => <Button
-                                                variant={s[0] === remoteSource[0] ? "contained" : "outlined"}
-                                                onClick={() => setRemoteSource(s)}
+        <Box className={adjSelectedFontClass} sx={{p: 0, maxHeight: maxWindowHeight, mb: '16px' }} style={{position: 'fixed', top: '80px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
+            <Box sx={{ml: '16px'}}>
+                <Grid2 container spacing={1} sx={{m:0}}>
+                    <Grid2 container>
+                        <Grid2 item size={12} sx={{m:0}}>
+                            <ButtonGroup>
+                                {
+                                    sourceWhitelist.map(
+                                        s => <Button
+                                            variant={s[0] === remoteSource[0] ? "contained" : "outlined"}
+                                            onClick={() => setRemoteSource(s)}
+                                        >
+                                            {s[1]}
+                                        </Button>
+                                    )
+                                }
+                            </ButtonGroup>
+                        </Grid2>
+                        <Grid2 item size={12}>
+                            <ButtonGroup>
+                                <Button
+                                    onClick={() => setLanguage("")}
+                                    variant={language === "" ? "contained": "outlined"}
+                                    color="secondary"
+                                >
+                                    *
+                                </Button>
+                                {
+                                    languages
+                                        .map(
+                                            ce => <Button
+                                                onClick={() => setLanguage(ce)}
+                                                variant={language === ce ? "contained": "outlined"}
+                                                color="secondary"
                                             >
-                                                {s[1]}
+                                                {ce}
                                             </Button>
                                         )
-                                    }
-                                </ButtonGroup>
-                            </Grid2>
-                            <Grid2 item size={12}>
-                                <ButtonGroup>
-                                    <Button
-                                        onClick={() => setLanguage("")}
-                                        variant={language === "" ? "contained": "outlined"}
-                                        color="secondary"
-                                    >
-                                        *
-                                    </Button>
-                                    {
-                                        languages
-                                            .map(
-                                                ce => <Button
-                                                    onClick={() => setLanguage(ce)}
-                                                    variant={language === ce ? "contained": "outlined"}
-                                                    color="secondary"
-                                                >
-                                                    {ce}
-                                                </Button>
-                                            )
-                                    }
-                                </ButtonGroup>
-                            </Grid2>
-                            {
-                                catalog.length > 0 && 
-                                    <DataGrid
-                                        rows={rows}
-                                        columns={columns}
-                                        sx={{ fontSize: "1rem" }}
-                                    />
-                            }
-                            {
-                                catalog.length === 0 && <CircularProgress/>
-                            }
+                                }
+                            </ButtonGroup>
                         </Grid2>
+                        {
+                            catalog.length > 0 && 
+                                <DataGrid
+                                    rows={rows}
+                                    columns={columns}
+                                    sx={{ fontSize: "1rem" }}
+                                />
+                        }
+                        {
+                            catalog.length === 0 && <CircularProgress/>
+                        }
                     </Grid2>
-                </Box>
+                </Grid2>
             </Box>
-        </div>
+        </Box>
     );
 }
 
