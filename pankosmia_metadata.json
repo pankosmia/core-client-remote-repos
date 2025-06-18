@@ -20,15 +20,43 @@
     },
     "downloaded": {
       "en": "has been downloaded",
-      "es": "fue descargado"
+      "es": "fue descargado",
+      "fr": "a été téléchargé"
     },
     "downloading": {
       "en": "Downloading",
-      "es": "Descargando"
+      "es": "Descargando",
+      "fr": "Téléchargement"
     },
     "failed_to_download": {
       "en": "has failed to download",
-      "es": "no se pudo descargar"
+      "es": "no se pudo descargar",
+      "fr": "n'a pas pu être téléchargé"
+    },
+    "row_resource_code": {
+      "en": "Resource Code",
+      "es": "Código de Recurso",
+      "fr": "Code Ressource"
+    },
+    "row_language": {
+      "en": "Language",
+      "es": "Idioma",
+      "fr": "Langue"
+    },
+    "row_description": {
+      "en": "Description",
+      "es": "Descripción",
+      "fr": "Description"
+    },
+    "row_type": {
+      "en": "Type",
+      "es": "Tipo",
+      "fr": "Type"
+    },
+    "row_download": {
+      "en": "Download",
+      "es": "Descargar",
+      "fr": "Télécharger"
     }
   }
 }
