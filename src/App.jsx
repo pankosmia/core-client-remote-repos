@@ -34,6 +34,7 @@ function App() {
     );
 
     const [localRepos, setLocalRepos] = useState([]);
+    const [isDownloading, setIsDownloading] = useState([]);
 
     useEffect(
         () => {
@@ -98,21 +99,26 @@ function App() {
 
                 return localRepos.includes(remoteRepoPath) ?
                     <CloudDone color="disabled"/> :
+                    ( isDownloading.includes(remoteRepoPath) ?
+                    <CircularProgress color="secondary" /> :
                     <CloudDownload
                         disabled={localRepos.includes(remoteRepoPath)}
                         onClick={async () => {
+                            setIsDownloading([...isDownloading, remoteRepoPath]);
                             enqueueSnackbar(
                                 `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
                                 {variant: "info"}
                             );
                             const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
                             if (fetchResponse.ok) {
+                                setIsDownloading([]);
                                 enqueueSnackbar(
                                     `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
                                     {variant: "success"}
                                 );
                                 setRemoteSource([...remoteSource]) // Trigger local repo check
                             } else {
+                                setIsDownloading([]);
                                 enqueueSnackbar(
                                     `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
                                     {variant: "error"}
@@ -120,7 +126,7 @@ function App() {
                             }
                         }
                         }
-                    />;
+                    />);
                 }
         }
     ]
