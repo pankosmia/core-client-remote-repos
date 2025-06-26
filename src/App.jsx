@@ -34,7 +34,6 @@ function App() {
     );
 
     const [localRepos, setLocalRepos] = useState([]);
-    const [isDownloading, setIsDownloading] = useState([]);
 
     useEffect(
         () => {
@@ -54,6 +53,33 @@ function App() {
     )
         .filter(l => l)
         .sort();
+    
+    const rowsArray = catalog
+    .map(
+        (e, n) => {
+            if (localRepos.includes(`${remoteSource[0]}/${e.name}`)){
+                return "downloaded"
+            } else {
+                return "missing"
+            }
+        }
+    ) 
+
+    const [isDownloading, setIsDownloading] = useState([]);
+    const [isDownloading2, setIsDownloading2] = useState([]);
+
+    useEffect(
+        () => {
+            setIsDownloading(rowsArray);
+        },
+        [catalog]
+    )
+
+    useEffect(
+        () => {
+        },
+        [isDownloading]
+    )
 
     // Columns for the Data Grid
     const columns = [
@@ -96,33 +122,40 @@ function App() {
             renderCell: (params) => {
 
                 const remoteRepoPath = `${remoteSource[0]}/${params.row.name}`;
+                
+                /* console.log(params.row.number.length); */
+                /* console.log(rowsArray);
+                console.log(params); */
 
-                return localRepos.includes(remoteRepoPath) ?
+
+                return /* localRepos.includes(remoteRepoPath) */(isDownloading[params.id-1] === "downloaded") ?
                     <CloudDone color="disabled"/> :
-                    ( isDownloading.includes(remoteRepoPath) ?
+                    ( (isDownloading[params.id-1] === "downloading") ?
                     <CircularProgress color="secondary" /> :
                     <CloudDownload
-                        disabled={localRepos.includes(remoteRepoPath)}
+                        disabled={isDownloading[params.id-1] === ("downloaded" || "missing")}
                         onClick={async () => {
-                            setIsDownloading([...isDownloading, remoteRepoPath]);
+                            
+                            setIsDownloading(isDownloading.splice(params.id-1, 0, "downloading"));
+                            console.log(isDownloading[params.id-1]);
                             enqueueSnackbar(
                                 `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
                                 {variant: "info"}
                             );
                             const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
                             if (fetchResponse.ok) {
-                                setIsDownloading([]);
                                 enqueueSnackbar(
                                     `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
                                     {variant: "success"}
                                 );
                                 setRemoteSource([...remoteSource]) // Trigger local repo check
+                                setIsDownloading(isDownloading.splice(params.id-1, 0, "downloaded"));
                             } else {
-                                setIsDownloading([]);
                                 enqueueSnackbar(
                                     `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
                                     {variant: "error"}
                                 );
+                                setIsDownloading(isDownloading.splice(params.id-1, 0, "missing"));
                             }
                         }
                         }
@@ -142,6 +175,10 @@ function App() {
             type: doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
         }
     })
+
+    /* console.log(`${remoteSource[0]}/${rows.name}`);*/
+    console.log(isDownloading);
+ /*    console.log(catalog); */
 
     return (
         <Box className={adjSelectedFontClass} sx={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
