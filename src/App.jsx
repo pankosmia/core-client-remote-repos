@@ -65,10 +65,10 @@ function App() {
         }
     )
 
-    const [isDownloading, setIsDownloading] = useState();
-/*  const [isDownloading2, setIsDownloading2] = useState([]); */
+/*     const [isDownloading, setIsDownloading] = useState(); */
+ const [isDownloading2, setIsDownloading2] = useState([]);
 
-    useEffect(
+   /*  useEffect(
         () => {
             setIsDownloading(rowsArray);
         },
@@ -79,7 +79,7 @@ function App() {
         () => {
         },
         [isDownloading]
-    )
+    ) */
 
     // Columns for the Data Grid
     const columns = [
@@ -130,34 +130,50 @@ function App() {
 
                 return localRepos.includes(remoteRepoPath) ?
                     <CloudDone color="disabled"/> :
-                    (isDownloading[params.id] === "downloading" ? 
+                    (isDownloading2.includes(params.id) ? 
                     <CircularProgress color="secondary" /> :
                     <CloudDownload
-                        disabled={isDownloading[params.id] === "downloaded"}
-                        onClick={async () => {
+                        disabled={/* isDownloading[params.id] === "downloaded" */localRepos.includes(remoteRepoPath)}
+                        onClick={ async () => {
+                            const functionQueue = [];
                             /*  setIsDownloading(rowsArray[params.id-1] === "downloading"); */
+                            
                             enqueueSnackbar(
                                 `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
                                 {variant: "info"}
                             );
                             const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
-                            setIsDownloading(isDownloading.splice(params.id, 0, "downloading"));
-                            console.log(isDownloading[params.id]);
+
+                            const fetchFunction = () => {
+                                setIsDownloading2([...isDownloading2, params.id]);
+                                if (fetchResponse.ok) {
+                                    enqueueSnackbar(
+                                        `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
+                                        {variant: "success"}
+                                    );
+                                    setRemoteSource([...remoteSource]); // Trigger local repo check
+                                    /* setIsDownloading(isDownloading.splice(params.id, 1, "downloaded")); */
+                                    setIsDownloading2(isDownloading2.filter((e) => e !== params.id))
+                                } else {
+                                    enqueueSnackbar(
+                                        `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
+                                        {variant: "error"}
+                                    );
+                                    /* setIsDownloading(isDownloading.splice(params.id, 1, "missing")); */
+                                    setIsDownloading2(isDownloading2.filter((e) => e !== params.id))
+                                }
+                            };
+                            functionQueue.push(fetchFunction);
+                            while (functionQueue.length > 0) {
+                                const currentFunction = functionQueue.shift(); // Remove and get the first function
+                                currentFunction(); // Execute the function
+                                }
                             
-                            if (fetchResponse.ok) {
-                                enqueueSnackbar(
-                                    `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
-                                    {variant: "success"}
-                                );
-                                setRemoteSource([...remoteSource]) // Trigger local repo check
-                                setIsDownloading(isDownloading.splice(params.id, 0, "downloaded"));
-                            } else {
-                                enqueueSnackbar(
-                                    `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
-                                    {variant: "error"}
-                                );
-                                setIsDownloading(isDownloading.splice(params.id, 0, "missing"));
-                            }
+                           /*  setIsDownloading(isDownloading.forEach((e, n) => e[params.id] = "downloading")); */
+                           
+                            console.log(isDownloading2);
+                            
+                            
                         }
                         }
                     />
@@ -165,6 +181,10 @@ function App() {
             }
         }
     ]
+
+    /* console.log(`${remoteSource[0]}/${rows.name}`);*/
+    console.log(isDownloading2);
+    console.log(catalog); 
 
     // Rows for the Data Grid
     const rows = catalog.filter(ce => ce.flavor && (language === "" || language === ce.language_code)).map((ce, n) => {
@@ -177,10 +197,6 @@ function App() {
             type: doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
         }
     })
-
-    /* console.log(`${remoteSource[0]}/${rows.name}`);*/
-    console.log(isDownloading);
- /*    console.log(catalog); */
 
     return (
         <Box className={adjSelectedFontClass} sx={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
