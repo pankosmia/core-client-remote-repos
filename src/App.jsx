@@ -63,10 +63,10 @@ function App() {
                 return "missing"
             }
         }
-    ) 
+    )
 
-    const [isDownloading, setIsDownloading] = useState([]);
-    const [isDownloading2, setIsDownloading2] = useState([]);
+    const [isDownloading, setIsDownloading] = useState();
+/*  const [isDownloading2, setIsDownloading2] = useState([]); */
 
     useEffect(
         () => {
@@ -128,39 +128,41 @@ function App() {
                 console.log(params); */
 
 
-                return /* localRepos.includes(remoteRepoPath) */(isDownloading[params.id-1] === "downloaded") ?
+                return localRepos.includes(remoteRepoPath) ?
                     <CloudDone color="disabled"/> :
-                    ( (isDownloading[params.id-1] === "downloading") ?
+                    (isDownloading[params.id] === "downloading" ? 
                     <CircularProgress color="secondary" /> :
                     <CloudDownload
-                        disabled={isDownloading[params.id-1] === ("downloaded" || "missing")}
+                        disabled={isDownloading[params.id] === "downloaded"}
                         onClick={async () => {
-                            
-                            setIsDownloading(isDownloading.splice(params.id-1, 0, "downloading"));
-                            console.log(isDownloading[params.id-1]);
+                            /*  setIsDownloading(rowsArray[params.id-1] === "downloading"); */
                             enqueueSnackbar(
                                 `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
                                 {variant: "info"}
                             );
                             const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
+                            setIsDownloading(isDownloading.splice(params.id, 0, "downloading"));
+                            console.log(isDownloading[params.id]);
+                            
                             if (fetchResponse.ok) {
                                 enqueueSnackbar(
                                     `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
                                     {variant: "success"}
                                 );
                                 setRemoteSource([...remoteSource]) // Trigger local repo check
-                                setIsDownloading(isDownloading.splice(params.id-1, 0, "downloaded"));
+                                setIsDownloading(isDownloading.splice(params.id, 0, "downloaded"));
                             } else {
                                 enqueueSnackbar(
                                     `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
                                     {variant: "error"}
                                 );
-                                setIsDownloading(isDownloading.splice(params.id-1, 0, "missing"));
+                                setIsDownloading(isDownloading.splice(params.id, 0, "missing"));
                             }
                         }
                         }
-                    />);
-                }
+                    />
+                    );
+            }
         }
     ]
 
