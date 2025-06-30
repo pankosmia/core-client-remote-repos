@@ -1,4 +1,4 @@
-import {useState, useEffect, useContext, useCallback} from "react"
+import {useState, useEffect, useContext, useCallback, useRef} from "react"
 import {Box, Button, ButtonGroup, Grid2, CircularProgress, Typography} from "@mui/material";
 import {DataGrid} from '@mui/x-data-grid';
 import {CloudDownload, CloudDone} from "@mui/icons-material";
@@ -55,19 +55,35 @@ function App() {
         .sort();
     
     const [isDownloading, setIsDownloading] = useState(null);
+    const prevRemoteSourceRef = useRef();
+    const prevCatalogRef = useRef();
 
     useEffect(() => {
-        if (!isDownloading && (remoteSource && (catalog.length > 0) && localRepos)) {
+        prevRemoteSourceRef.current = remoteSource;
+        prevCatalogRef.current = remoteSource;
+      }, []);
+
+    useEffect(() => {
+        if ((!isDownloading && (catalog.length > 0) && localRepos) || !(remoteSource[0] === prevRemoteSourceRef.current[0]) || !(catalog === prevCatalogRef.current)) {
+            console.log("setIsDownloading.");
             setIsDownloading(catalog.reduce((downloadStates, e) => {
                 downloadStates[`${remoteSource[0]}/${e.name}`] = localRepos.includes(`${remoteSource[0]}/${e.name}`) ? "downloaded" : "notDownloaded";
                     return downloadStates;
-            },{}))
+            },{}));
+            prevRemoteSourceRef.current = remoteSource;
+            prevCatalogRef.current = catalog;
+            console.log(remoteSource);
+            console.log(prevRemoteSourceRef.current);
+            console.log(isDownloading);
         }
     },[isDownloading, remoteSource, catalog, localRepos])
+    console.log(catalog);
+    console.log(isDownloading);
+    console.log(localRepos);
 
     const handleDownloadClick = useCallback(async (params, remoteRepoPath) => {
 
-        setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [`${remoteSource[0]}/${params.row.name}`] : 'downloading'}));
+        setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath] : 'downloading'}));
         enqueueSnackbar(
             `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
             {variant: "info"}
@@ -81,13 +97,13 @@ function App() {
                 {variant: "success"}
             );
             setRemoteSource([...remoteSource]); // Trigger local repo check
-            setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [`${remoteSource[0]}/${params.row.name}`] : 'downloaded'}));
+            setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath] : 'downloaded'}));
         } else {
             enqueueSnackbar(
                 `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
                 {variant: "error"}
             );
-            setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [`${remoteSource[0]}/${params.row.name}`] : 'notDownloaded'}))
+            setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath] : 'notDownloaded'}))
         }
     }, [remoteSource]);
 
@@ -130,19 +146,17 @@ function App() {
             align:'left',
             
             renderCell: (params) => {
-
                 const remoteRepoPath = `${remoteSource[0]}/${params.row.name}`;
-
-                if (!isDownloading){
+                console.log(remoteRepoPath);
+                if (isDownloading){
+                    return isDownloading[remoteRepoPath] === "notDownloaded" ?
+                        <CloudDownload onClick={() => handleDownloadClick(params, remoteRepoPath)}/> :
+                        (isDownloading[remoteRepoPath] === "downloading" ?
+                        <CircularProgress size="30px" color="secondary" /> :
+                        <CloudDone color="disabled"/>)
+                } else {
                     return <CloudDownload disabled/>
                 }
-
-                return isDownloading[remoteRepoPath] === "notDownloaded" ?
-                <CloudDownload onClick={() => handleDownloadClick(params, remoteRepoPath)}/> :
-                (isDownloading[remoteRepoPath] === "downloading" ?
-                <CircularProgress color="secondary" /> :
-                <CloudDone color="disabled"/>
-                )
             }
         }
     ]
