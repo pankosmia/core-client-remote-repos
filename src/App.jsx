@@ -1,4 +1,4 @@
-import {useState, useEffect, useContext} from "react"
+import {useState, useEffect, useContext, useCallback} from "react"
 import {Box, Button, ButtonGroup, Grid2, CircularProgress, Typography} from "@mui/material";
 import {DataGrid} from '@mui/x-data-grid';
 import {CloudDownload, CloudDone} from "@mui/icons-material";
@@ -54,32 +54,42 @@ function App() {
         .filter(l => l)
         .sort();
     
-    const rowsArray = catalog
-    .map(
-        (e, n) => {
-            if (localRepos.includes(`${remoteSource[0]}/${e.name}`)){
-                return "downloaded"
-            } else {
-                return "missing"
-            }
+    const [isDownloading, setIsDownloading] = useState(null);
+
+    useEffect(() => {
+        if (!isDownloading && (remoteSource && (catalog.length > 0) && localRepos)) {
+            setIsDownloading(catalog.reduce((downloadStates, e) => {
+                downloadStates[`${remoteSource[0]}/${e.name}`] = localRepos.includes(`${remoteSource[0]}/${e.name}`) ? "downloaded" : "notDownloaded";
+                    return downloadStates;
+            },{}))
         }
-    )
+    },[isDownloading, remoteSource, catalog, localRepos])
 
-/*     const [isDownloading, setIsDownloading] = useState(); */
- const [isDownloading2, setIsDownloading2] = useState([]);
+    const handleDownloadClick = useCallback(async (params, remoteRepoPath) => {
 
-   /*  useEffect(
-        () => {
-            setIsDownloading(rowsArray);
-        },
-        [catalog]
-    )
-
-    useEffect(
-        () => {
-        },
-        [isDownloading]
-    ) */
+        setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [`${remoteSource[0]}/${params.row.name}`] : 'downloading'}));
+        enqueueSnackbar(
+            `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
+            {variant: "info"}
+        );
+        
+        const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
+        
+        if (fetchResponse.ok) {
+            enqueueSnackbar(
+                `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
+                {variant: "success"}
+            );
+            setRemoteSource([...remoteSource]); // Trigger local repo check
+            setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [`${remoteSource[0]}/${params.row.name}`] : 'downloaded'}));
+        } else {
+            enqueueSnackbar(
+                `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
+                {variant: "error"}
+            );
+            setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [`${remoteSource[0]}/${params.row.name}`] : 'notDownloaded'}))
+        }
+    }, [remoteSource]);
 
     // Columns for the Data Grid
     const columns = [
@@ -122,69 +132,20 @@ function App() {
             renderCell: (params) => {
 
                 const remoteRepoPath = `${remoteSource[0]}/${params.row.name}`;
-                
-                /* console.log(params.row.number.length); */
-                /* console.log(rowsArray);
-                console.log(params); */
 
+                if (!isDownloading){
+                    return <CloudDownload disabled/>
+                }
 
-                return localRepos.includes(remoteRepoPath) ?
-                    <CloudDone color="disabled"/> :
-                    (isDownloading2.includes(params.id) ? 
-                    <CircularProgress color="secondary" /> :
-                    <CloudDownload
-                        disabled={/* isDownloading[params.id] === "downloaded" */localRepos.includes(remoteRepoPath)}
-                        onClick={ async () => {
-                            const functionQueue = [];
-                            /*  setIsDownloading(rowsArray[params.id-1] === "downloading"); */
-                            
-                            enqueueSnackbar(
-                                `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
-                                {variant: "info"}
-                            );
-                            const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
-
-                            const fetchFunction = () => {
-                                setIsDownloading2([...isDownloading2, params.id]);
-                                if (fetchResponse.ok) {
-                                    enqueueSnackbar(
-                                        `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
-                                        {variant: "success"}
-                                    );
-                                    setRemoteSource([...remoteSource]); // Trigger local repo check
-                                    /* setIsDownloading(isDownloading.splice(params.id, 1, "downloaded")); */
-                                    setIsDownloading2(isDownloading2.filter((e) => e !== params.id))
-                                } else {
-                                    enqueueSnackbar(
-                                        `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
-                                        {variant: "error"}
-                                    );
-                                    /* setIsDownloading(isDownloading.splice(params.id, 1, "missing")); */
-                                    setIsDownloading2(isDownloading2.filter((e) => e !== params.id))
-                                }
-                            };
-                            functionQueue.push(fetchFunction);
-                            while (functionQueue.length > 0) {
-                                const currentFunction = functionQueue.shift(); // Remove and get the first function
-                                currentFunction(); // Execute the function
-                                }
-                            
-                           /*  setIsDownloading(isDownloading.forEach((e, n) => e[params.id] = "downloading")); */
-                           
-                            console.log(isDownloading2);
-                            
-                            
-                        }
-                        }
-                    />
-                    );
+                return isDownloading[remoteRepoPath] === "notDownloaded" ?
+                <CloudDownload onClick={() => handleDownloadClick(params, remoteRepoPath)}/> :
+                (isDownloading[remoteRepoPath] === "downloading" ?
+                <CircularProgress color="secondary" /> :
+                <CloudDone color="disabled"/>
+                )
             }
         }
     ]
-
-    /* console.log(`${remoteSource[0]}/${rows.name}`);*/
-    console.log(isDownloading2);
-    console.log(catalog); 
 
     // Rows for the Data Grid
     const rows = catalog.filter(ce => ce.flavor && (language === "" || language === ce.language_code)).map((ce, n) => {
