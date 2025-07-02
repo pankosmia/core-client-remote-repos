@@ -3,7 +3,7 @@ import {Box, Button, ButtonGroup, Grid2, CircularProgress, Typography} from "@mu
 import {DataGrid} from '@mui/x-data-grid';
 import {CloudDownload, CloudDone} from "@mui/icons-material";
 import {enqueueSnackbar} from "notistack";
-import {getAndSetJson, getJson, i18nContext, doI18n, typographyContext} from "pithekos-lib";
+import {getAndSetJson, getJson, i18nContext, doI18n, typographyContext, debugContext} from "pithekos-lib";
 import GraphiteTest from "./GraphiteTest";
 
 
@@ -11,6 +11,7 @@ function App() {
 
     const { typographyRef } = useContext(typographyContext);
     const {i18nRef} = useContext(i18nContext);
+    const {debugRef} = useContext(debugContext);
 
     const isGraphite = GraphiteTest()
     /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
@@ -21,17 +22,29 @@ function App() {
         ["git.door43.org/uW", "unfoldingWord Burritos (Door43)"],
     ];
     const [remoteSource, setRemoteSource] = useState(sourceWhitelist[0]);
-    const [catalog, setCatalog] = useState([]);
+    const [catalog, setCatalog] = useState(null);
     const [language, setLanguage] = useState("");
+
     useEffect(
-        () => {
-            getAndSetJson({
-                url: `/gitea/remote-repos/${remoteSource[0]}`,
-                setter: setCatalog
-            }).then()
+        async () => {
+            if (!catalog){
+                let newCatalog = {};
+                for (const source of sourceWhitelist){
+                    console.log(source[0]);
+                    const response = await getJson(`/gitea/remote-repos/${source[0]}`, debugRef.current);
+                    if (response.ok){
+                        console.log(response.json);
+                        newCatalog={...newCatalog,...response.json}
+                    }
+                }
+                setCatalog(newCatalog);
+                console.log(newCatalog);
+                console.log(catalog);
+            }
         },
-        [remoteSource]
+        [catalog, remoteSource]
     );
+    // setCatalog(remoteSource.forEach( () => getJson(etc)))
 
     const [localRepos, setLocalRepos] = useState([]);
 
@@ -45,41 +58,29 @@ function App() {
         [remoteSource]
     );
 
-    const languages = Array.from(
+   /*  const languages = Array.from(
         new Set(
             (catalog || [])
         .map(cv => cv.language_code)
         )
     )
         .filter(l => l)
-        .sort();
+        .sort(); */
     
     const [isDownloading, setIsDownloading] = useState(null);
-    const prevRemoteSourceRef = useRef();
-    const prevCatalogRef = useRef();
 
     useEffect(() => {
-        prevRemoteSourceRef.current = remoteSource;
-        prevCatalogRef.current = remoteSource;
-      }, []);
-
-    useEffect(() => {
-        if ((!isDownloading && (catalog.length > 0) && localRepos) || !(remoteSource[0] === prevRemoteSourceRef.current[0]) || !(catalog === prevCatalogRef.current)) {
+        if ((!isDownloading && (catalog/* .length > 0 */) && localRepos)) {
             console.log("setIsDownloading.");
             setIsDownloading(catalog.reduce((downloadStates, e) => {
                 downloadStates[`${remoteSource[0]}/${e.name}`] = localRepos.includes(`${remoteSource[0]}/${e.name}`) ? "downloaded" : "notDownloaded";
                     return downloadStates;
             },{}));
-            prevRemoteSourceRef.current = remoteSource;
-            prevCatalogRef.current = catalog;
-            console.log(remoteSource);
-            console.log(prevRemoteSourceRef.current);
             console.log(isDownloading);
         }
     },[isDownloading, remoteSource, catalog, localRepos])
-    console.log(catalog);
-    console.log(isDownloading);
-    console.log(localRepos);
+
+    // setIsDownloading(all catalogs)
 
     const handleDownloadClick = useCallback(async (params, remoteRepoPath) => {
 
@@ -108,7 +109,7 @@ function App() {
     }, [remoteSource]);
 
     // Columns for the Data Grid
-    const columns = [
+/*     const columns = [
         {
             field: 'resourceCode',
             headerName: <Typography variant="h5" >{doI18n("pages:core-remote-resources:row_resource_code", i18nRef.current)}</Typography>,
@@ -147,22 +148,21 @@ function App() {
             
             renderCell: (params) => {
                 const remoteRepoPath = `${remoteSource[0]}/${params.row.name}`;
-                console.log(remoteRepoPath);
-                if (isDownloading){
-                    return isDownloading[remoteRepoPath] === "notDownloaded" ?
+                //console.log(remoteRepoPath);
+                if (!isDownloading){
+                    return <CloudDownload disabled/>
+                }
+                return isDownloading[remoteRepoPath] === "notDownloaded" ?
                         <CloudDownload onClick={() => handleDownloadClick(params, remoteRepoPath)}/> :
                         (isDownloading[remoteRepoPath] === "downloading" ?
                         <CircularProgress size="30px" color="secondary" /> :
                         <CloudDone color="disabled"/>)
-                } else {
-                    return <CloudDownload disabled/>
-                }
             }
         }
-    ]
+    ] */
 
     // Rows for the Data Grid
-    const rows = catalog.filter(ce => ce.flavor && (language === "" || language === ce.language_code)).map((ce, n) => {
+    /* const rows = catalog.filter(ce => ce.local_path.startsWith(remoteSource)).filter(ce => ce.flavor && (language === "" || language === ce.language_code)).map((ce, n) => {
         return {
             ...ce,
             id: n,
@@ -171,7 +171,7 @@ function App() {
             description: ce.description,
             type: doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
         }
-    })
+    }) */
 
     return (
         <Box className={adjSelectedFontClass} sx={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
@@ -200,7 +200,7 @@ function App() {
                             >
                                 *
                             </Button>
-                            {
+                            {/* {
                                 languages
                                     .map(
                                         ce => <Button
@@ -211,19 +211,19 @@ function App() {
                                             {ce}
                                         </Button>
                                     )
-                            }
+                            } */}
                         </ButtonGroup>
                     </Grid2>
-                    {
+                    {/* {
                         catalog.length > 0 && 
                             <DataGrid
                                 rows={rows}
                                 columns={columns}
                                 sx={{ fontSize: "1rem" }}
                             />
-                    }
+                    } */}
                     {
-                        catalog.length === 0 && <CircularProgress/>
+                        catalog/* .length === 0  &&*/? <CircularProgress/> : 'nothing here'
                     }
                 </Grid2>
             </Grid2>
