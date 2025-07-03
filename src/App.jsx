@@ -29,24 +29,19 @@ function App() {
     useEffect(
         () => {
             const doCatalog = async () => {
-                console.log("start useEffect");
                 if (catalog.length === 0) {
                     let newCatalog = [];
                     for (const source of sourceWhitelist) {
-                        console.log("source", source[0]);
                         const response = await getJson(`/gitea/remote-repos/${source[0]}`, debugRef.current);
                         if (response.ok) {
                             const newResponse = response.json.map(r => {
                                 return {...r, source: source[0]}
                             })
-                            console.log("response", response.json);
                             newCatalog = [...newCatalog, ...newResponse];
                         }
                     }
                     setCatalog(newCatalog);
-                    console.log("New catalog", newCatalog);
                 }
-                console.log("end useEffect");
             }
             doCatalog().then();
         },
@@ -77,24 +72,20 @@ function App() {
     useEffect(() => {
         if (!isDownloading && (catalog.length > 0) && localRepos) {
             const newIsDownloading = catalog.reduce((downloadStates, e) => {
-                downloadStates[`${remoteSource[0]}/${e.name}`] = localRepos.includes(`${remoteSource[0]}/${e.name}`) ? "downloaded" : "notDownloaded";
+                downloadStates[`${e.source}/${e.name}`] = localRepos.includes(`${e.source}/${e.name}`) ? "downloaded" : "notDownloaded";
                 return downloadStates;
             }, {});
             setIsDownloading(newIsDownloading);
-            console.log("newIsDownloading", newIsDownloading);
         }
     }, [isDownloading, remoteSource, catalog, localRepos])
 
     const handleDownloadClick = useCallback(async (params, remoteRepoPath) => {
-
         setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath]: 'downloading'}));
         enqueueSnackbar(
             `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
             {variant: "info"}
         );
-
         const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
-
         if (fetchResponse.ok) {
             enqueueSnackbar(
                 `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
@@ -156,7 +147,6 @@ function App() {
 
             renderCell: (params) => {
                 const remoteRepoPath = `${remoteSource[0]}/${params.row.name}`;
-                //console.log(remoteRepoPath);
                 if (!isDownloading) {
                     return <CloudDownload disabled/>
                 }
