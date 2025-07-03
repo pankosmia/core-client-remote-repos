@@ -22,29 +22,30 @@ function App() {
         ["git.door43.org/uW", "unfoldingWord Burritos (Door43)"],
     ];
     const [remoteSource, setRemoteSource] = useState(sourceWhitelist[0]);
-    const [catalog, setCatalog] = useState(null);
+    const [catalog, setCatalog] = useState([]);
     const [language, setLanguage] = useState("");
 
     useEffect(
         async () => {
-            if (!catalog){
-                let newCatalog = {};
+            console.log("useeffecttt");
+            if (catalog.length === 0){
+                let newCatalog = [];
                 for (const source of sourceWhitelist){
                     console.log(source[0]);
                     const response = await getJson(`/gitea/remote-repos/${source[0]}`, debugRef.current);
                     if (response.ok){
+                        const newResponse = response.json.map((r) => {return {...r, source: source[0]}})
                         console.log(response.json);
-                        newCatalog={...newCatalog,...response.json}
+                        newCatalog = [...newCatalog, ...newResponse];
                     }
                 }
                 setCatalog(newCatalog);
                 console.log(newCatalog);
-                console.log(catalog);
             }
         },
         [catalog, remoteSource]
     );
-    // setCatalog(remoteSource.forEach( () => getJson(etc)))
+
 
     const [localRepos, setLocalRepos] = useState([]);
 
@@ -58,19 +59,19 @@ function App() {
         [remoteSource]
     );
 
-   /*  const languages = Array.from(
+    const languages = Array.from(
         new Set(
             (catalog || [])
         .map(cv => cv.language_code)
         )
     )
         .filter(l => l)
-        .sort(); */
+        .sort();
     
     const [isDownloading, setIsDownloading] = useState(null);
 
     useEffect(() => {
-        if ((!isDownloading && (catalog/* .length > 0 */) && localRepos)) {
+        if ((!isDownloading && (catalog.length > 0) && localRepos)) {
             console.log("setIsDownloading.");
             setIsDownloading(catalog.reduce((downloadStates, e) => {
                 downloadStates[`${remoteSource[0]}/${e.name}`] = localRepos.includes(`${remoteSource[0]}/${e.name}`) ? "downloaded" : "notDownloaded";
@@ -79,8 +80,6 @@ function App() {
             console.log(isDownloading);
         }
     },[isDownloading, remoteSource, catalog, localRepos])
-
-    // setIsDownloading(all catalogs)
 
     const handleDownloadClick = useCallback(async (params, remoteRepoPath) => {
 
@@ -109,7 +108,7 @@ function App() {
     }, [remoteSource]);
 
     // Columns for the Data Grid
-/*     const columns = [
+    const columns = [
         {
             field: 'resourceCode',
             headerName: <Typography variant="h5" >{doI18n("pages:core-remote-resources:row_resource_code", i18nRef.current)}</Typography>,
@@ -159,10 +158,10 @@ function App() {
                         <CloudDone color="disabled"/>)
             }
         }
-    ] */
+    ]
 
     // Rows for the Data Grid
-    /* const rows = catalog.filter(ce => ce.local_path.startsWith(remoteSource)).filter(ce => ce.flavor && (language === "" || language === ce.language_code)).map((ce, n) => {
+    const rows = catalog.filter(ce => ce.source.startsWith(remoteSource[0])).filter(ce => ce.flavor && (language === "" || language === ce.language_code)).map((ce, n) => {
         return {
             ...ce,
             id: n,
@@ -171,7 +170,7 @@ function App() {
             description: ce.description,
             type: doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
         }
-    }) */
+    })
 
     return (
         <Box className={adjSelectedFontClass} sx={{ mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%' }}>
@@ -200,7 +199,7 @@ function App() {
                             >
                                 *
                             </Button>
-                            {/* {
+                            {
                                 languages
                                     .map(
                                         ce => <Button
@@ -211,19 +210,19 @@ function App() {
                                             {ce}
                                         </Button>
                                     )
-                            } */}
+                            }
                         </ButtonGroup>
                     </Grid2>
-                    {/* {
+                    {
                         catalog.length > 0 && 
                             <DataGrid
                                 rows={rows}
                                 columns={columns}
                                 sx={{ fontSize: "1rem" }}
                             />
-                    } */}
+                    }
                     {
-                        catalog/* .length === 0  &&*/? <CircularProgress/> : 'nothing here'
+                        catalog.length === 0 && <CircularProgress/>
                     }
                 </Grid2>
             </Grid2>
