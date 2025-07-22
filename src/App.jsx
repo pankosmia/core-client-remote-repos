@@ -106,24 +106,21 @@ function App() {
     const columns = [
         {
             field: 'resourceCode',
-            headerName: <Typography
-                variant="h5">{doI18n("pages:core-remote-resources:row_resource_code", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-remote-resources:row_resource_code", i18nRef.current),
             flex: 0.5,
             headerAlign: 'left',
             align: 'left'
         },
         {
             field: 'language',
-            headerName: <Typography
-                variant="h5">{doI18n("pages:core-remote-resources:row_language", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-remote-resources:row_language", i18nRef.current),
             flex: 0.5,
             headerAlign: 'left',
             align: 'left'
         },
         {
             field: 'description',
-            headerName: <Typography
-                variant="h5">{doI18n("pages:core-remote-resources:row_description", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-remote-resources:row_description", i18nRef.current),
             type: "number",
             flex: 2,
             headerAlign: 'left',
@@ -131,16 +128,14 @@ function App() {
         },
         {
             field: 'type',
-            headerName: <Typography
-                variant="h5">{doI18n("pages:core-remote-resources:row_type", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-remote-resources:row_type", i18nRef.current),
             flex: 1.5,
             headerAlign: 'left',
             align: 'left'
         },
         {
             field: 'download',
-            headerName: <Typography
-                variant="h5">{doI18n("pages:core-remote-resources:row_download", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-remote-resources:row_download", i18nRef.current),
             flex: 0.5,
             headerAlign: 'left',
             align: 'left',
@@ -193,7 +188,8 @@ function App() {
                             }
                         </ButtonGroup>
                     </Grid2>
-                    <Grid2 item size={12}>
+                    {/* <Grid2 item size={12}>
+                        <Typography variant="body1">{`${remoteSource[1]} is selected`}</Typography>
                         <ButtonGroup>
                             <Button
                                 onClick={() => setLanguage("")}
@@ -215,7 +211,7 @@ function App() {
                                     )
                             }
                         </ButtonGroup>
-                    </Grid2>
+                    </Grid2> */}
                     {
                         catalog.length > 0 &&
                         <DataGrid
