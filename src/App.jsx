@@ -139,6 +139,7 @@ function App() {
         },
         {
             field: 'download',
+            sortable: false,
             headerName: <Typography
                 variant="h5">{doI18n("pages:core-remote-resources:row_download", i18nRef.current)}</Typography>,
             flex: 0.5,
