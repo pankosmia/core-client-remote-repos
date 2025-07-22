@@ -124,7 +124,6 @@ function App() {
             field: 'description',
             headerName: <Typography
                 variant="h5">{doI18n("pages:core-remote-resources:row_description", i18nRef.current)}</Typography>,
-            type: "number",
             flex: 2,
             headerAlign: 'left',
             align: 'left'
@@ -139,6 +138,7 @@ function App() {
         },
         {
             field: 'download',
+            sortable: false,
             headerName: <Typography
                 variant="h5">{doI18n("pages:core-remote-resources:row_download", i18nRef.current)}</Typography>,
             flex: 0.5,
