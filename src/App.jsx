@@ -219,6 +219,11 @@ function App() {
                     {
                         catalog.length > 0 &&
                         <DataGrid
+                            initialState={{
+                                sorting: {
+                                    sortModel: [{ field: 'resourceCode', sort: 'asc' }],
+                                }
+                            }}
                             rows={rows}
                             columns={columns}
                             sx={{fontSize: "1rem"}}
