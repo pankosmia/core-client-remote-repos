@@ -188,30 +188,6 @@ function App() {
                             }
                         </ButtonGroup>
                     </Grid2>
-                    {/* <Grid2 item size={12}>
-                        <Typography variant="body1">{`${remoteSource[1]} is selected`}</Typography>
-                        <ButtonGroup>
-                            <Button
-                                onClick={() => setLanguage("")}
-                                variant={language === "" ? "contained" : "outlined"}
-                                color="secondary"
-                            >
-                                *
-                            </Button>
-                            {
-                                languages
-                                    .map(
-                                        ce => <Button
-                                            onClick={() => setLanguage(ce)}
-                                            variant={language === ce ? "contained" : "outlined"}
-                                            color="secondary"
-                                        >
-                                            {ce}
-                                        </Button>
-                                    )
-                            }
-                        </ButtonGroup>
-                    </Grid2> */}
                     {
                         catalog.length > 0 &&
                         <DataGrid
