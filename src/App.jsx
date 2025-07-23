@@ -120,8 +120,7 @@ function App() {
         },
         {
             field: 'description',
-            headerName: <Typography
-                variant="h5">{doI18n("pages:core-remote-resources:row_description", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-remote-resources:row_description", i18nRef.current),
             flex: 2,
             headerAlign: 'left',
             align: 'left'
@@ -135,8 +134,8 @@ function App() {
         },
         {
             field: 'download',
-            headerName: <Typography
-                variant="h5">{doI18n("pages:core-remote-resources:row_download", i18nRef.current)}</Typography>,
+            sortable: false,
+            headerName: doI18n("pages:core-remote-resources:row_download", i18nRef.current),
             flex: 0.5,
             headerAlign: 'left',
             align: 'left',
