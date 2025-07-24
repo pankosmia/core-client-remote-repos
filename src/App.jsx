@@ -109,6 +109,7 @@ function App() {
             headerName: <Typography
                 variant="h5">{doI18n("pages:core-remote-resources:row_resource_code", i18nRef.current)}</Typography>,
             flex: 0.5,
+            minWidth: 100,
             headerAlign: 'left',
             align: 'left'
         },
@@ -117,6 +118,7 @@ function App() {
             headerName: <Typography
                 variant="h5">{doI18n("pages:core-remote-resources:row_language", i18nRef.current)}</Typography>,
             flex: 0.5,
+            minWidth: 120,
             headerAlign: 'left',
             align: 'left'
         },
@@ -125,6 +127,7 @@ function App() {
             headerName: <Typography
                 variant="h5">{doI18n("pages:core-remote-resources:row_description", i18nRef.current)}</Typography>,
             flex: 2,
+            minWidth: 130,
             headerAlign: 'left',
             align: 'left'
         },
@@ -133,6 +136,7 @@ function App() {
             headerName: <Typography
                 variant="h5">{doI18n("pages:core-remote-resources:row_type", i18nRef.current)}</Typography>,
             flex: 1.5,
+            minWidth: 80,
             headerAlign: 'left',
             align: 'left'
         },
@@ -142,6 +146,7 @@ function App() {
             headerName: <Typography
                 variant="h5">{doI18n("pages:core-remote-resources:row_download", i18nRef.current)}</Typography>,
             flex: 0.5,
+            minWidth: 120,
             headerAlign: 'left',
             align: 'left',
 
