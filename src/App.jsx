@@ -106,32 +106,28 @@ function App() {
     const columns = [
         {
             field: 'resourceCode',
-            headerName: <Typography
-                variant="h5">{doI18n("pages:core-remote-resources:row_resource_code", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-remote-resources:row_resource_code", i18nRef.current),
             flex: 0.5,
             headerAlign: 'left',
             align: 'left'
         },
         {
             field: 'language',
-            headerName: <Typography
-                variant="h5">{doI18n("pages:core-remote-resources:row_language", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-remote-resources:row_language", i18nRef.current),
             flex: 0.5,
             headerAlign: 'left',
             align: 'left'
         },
         {
             field: 'description',
-            headerName: <Typography
-                variant="h5">{doI18n("pages:core-remote-resources:row_description", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-remote-resources:row_description", i18nRef.current),
             flex: 2,
             headerAlign: 'left',
             align: 'left'
         },
         {
             field: 'type',
-            headerName: <Typography
-                variant="h5">{doI18n("pages:core-remote-resources:row_type", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-remote-resources:row_type", i18nRef.current),
             flex: 1.5,
             headerAlign: 'left',
             align: 'left'
@@ -139,8 +135,7 @@ function App() {
         {
             field: 'download',
             sortable: false,
-            headerName: <Typography
-                variant="h5">{doI18n("pages:core-remote-resources:row_download", i18nRef.current)}</Typography>,
+            headerName: doI18n("pages:core-remote-resources:row_download", i18nRef.current),
             flex: 0.5,
             headerAlign: 'left',
             align: 'left',
@@ -190,29 +185,6 @@ function App() {
                                         {s[1]}
                                     </Button>
                                 )
-                            }
-                        </ButtonGroup>
-                    </Grid2>
-                    <Grid2 item size={12}>
-                        <ButtonGroup>
-                            <Button
-                                onClick={() => setLanguage("")}
-                                variant={language === "" ? "contained" : "outlined"}
-                                color="secondary"
-                            >
-                                *
-                            </Button>
-                            {
-                                languages
-                                    .map(
-                                        ce => <Button
-                                            onClick={() => setLanguage(ce)}
-                                            variant={language === ce ? "contained" : "outlined"}
-                                            color="secondary"
-                                        >
-                                            {ce}
-                                        </Button>
-                                    )
                             }
                         </ButtonGroup>
                     </Grid2>
