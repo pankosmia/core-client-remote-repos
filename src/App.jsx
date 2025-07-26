@@ -108,7 +108,7 @@ function App() {
             field: 'resourceCode',
             headerName: doI18n("pages:core-remote-resources:row_resource_code", i18nRef.current),
             flex: 0.5,
-            minWidth: 100,
+            minWidth: 140,
             headerAlign: 'left',
             align: 'left'
         },
