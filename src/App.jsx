@@ -108,6 +108,7 @@ function App() {
             field: 'resourceCode',
             headerName: doI18n("pages:core-remote-resources:row_resource_code", i18nRef.current),
             flex: 0.5,
+            minWidth: 140,
             headerAlign: 'left',
             align: 'left'
         },
@@ -115,6 +116,7 @@ function App() {
             field: 'language',
             headerName: doI18n("pages:core-remote-resources:row_language", i18nRef.current),
             flex: 0.5,
+            minWidth: 120,
             headerAlign: 'left',
             align: 'left'
         },
@@ -122,6 +124,7 @@ function App() {
             field: 'description',
             headerName: doI18n("pages:core-remote-resources:row_description", i18nRef.current),
             flex: 2,
+            minWidth: 130,
             headerAlign: 'left',
             align: 'left'
         },
@@ -129,6 +132,7 @@ function App() {
             field: 'type',
             headerName: doI18n("pages:core-remote-resources:row_type", i18nRef.current),
             flex: 1.5,
+            minWidth: 80,
             headerAlign: 'left',
             align: 'left'
         },
@@ -137,6 +141,7 @@ function App() {
             sortable: false,
             headerName: doI18n("pages:core-remote-resources:row_download", i18nRef.current),
             flex: 0.5,
+            minWidth: 120,
             headerAlign: 'left',
             align: 'left',
 
