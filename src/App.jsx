@@ -85,7 +85,7 @@ function App() {
             `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
             {variant: "info"}
         );
-        const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`);
+        const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`,debugRef.current);
         if (fetchResponse.ok) {
             enqueueSnackbar(
                 `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
@@ -95,7 +95,7 @@ function App() {
             setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath]: 'downloaded'}));
         } else {
             enqueueSnackbar(
-                `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)}`,
+                `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)} : ${fetchResponse.error} (${fetchResponse.status})`,
                 {variant: "error"}
             );
             setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath]: 'notDownloaded'}))
