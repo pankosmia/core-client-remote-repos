@@ -1,7 +1,9 @@
-import {useState, useEffect, useContext, useCallback, useRef} from "react"
-import {Box, Button, ButtonGroup, Grid2, CircularProgress, Typography} from "@mui/material";
+import {useState, useEffect, useContext, useCallback} from "react"
+import {Box, Button, ButtonGroup, Grid2, CircularProgress} from "@mui/material";
 import {DataGrid} from '@mui/x-data-grid';
-import {CloudDownload, CloudDone} from "@mui/icons-material";
+import CloudDownload from "@mui/icons-material/CloudDownload";
+import CloudDone from "@mui/icons-material/CloudDone";
+import Update from "@mui/icons-material/Update";
 import {enqueueSnackbar} from "notistack";
 import {getAndSetJson, getJson, i18nContext, doI18n, typographyContext, debugContext} from "pithekos-lib";
 import GraphiteTest from "./GraphiteTest";
@@ -23,8 +25,8 @@ function App() {
     ];
     const [remoteSource, setRemoteSource] = useState(sourceWhitelist[0]);
     const [catalog, setCatalog] = useState([]);
-    const [language, setLanguage] = useState("");
     const [localRepos, setLocalRepos] = useState([]);
+    const [isDownloading, setIsDownloading] = useState(null);
 
     useEffect(
         () => {
@@ -58,35 +60,39 @@ function App() {
         [remoteSource]
     );
 
-    const languages = Array.from(
-        new Set(
-            (catalog || [])
-                .map(cv => cv.language_code)
-        )
-    )
-        .filter(l => l)
-        .sort();
-
-    const [isDownloading, setIsDownloading] = useState(null);
-
     useEffect(() => {
         if (!isDownloading && (catalog.length > 0) && localRepos) {
-            const newIsDownloading = catalog.reduce((downloadStates, e) => {
-                downloadStates[`${e.source}/${e.name}`] = localRepos.includes(`${e.source}/${e.name}`) ? "downloaded" : "notDownloaded";
-                return downloadStates;
-            }, {});
-            setIsDownloading(newIsDownloading);
+            const downloadStatus = async () => {
+                const newIsDownloading = {};
+                for (const e of catalog) {
+                    if (localRepos.includes(`${e.source}/${e.name}`)) {
+                        const metadataUrl = `/burrito/metadata/summary/${e.source}/${e.name}`;
+                        let metadataResponse = await getJson(metadataUrl, debugRef.current);
+                        if (metadataResponse.ok) {
+                            const metadataTime = metadataResponse.json.timestamp;
+                            const remoteUpdateTime = Date.parse(e.updated_at)/1000;
+                            newIsDownloading[`${e.source}/${e.name}`] = (remoteUpdateTime - metadataTime > 0) ? "updatable" : "downloaded"
+                        } else {
+                            newIsDownloading[`${e.source}/${e.name}`] = "downloaded";
+                        }
+                    } else {
+                        newIsDownloading[`${e.source}/${e.name}`] = "notDownloaded";
+                    }
+                }
+                setIsDownloading(newIsDownloading);
+            }
+            downloadStatus().then();
         }
     }, [isDownloading, remoteSource, catalog, localRepos])
 
-    const handleDownloadClick = useCallback(async (params, remoteRepoPath) => {
+    const handleDownloadClick = useCallback(async (params, remoteRepoPath, getType) => {
         setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath]: 'downloading'}));
         enqueueSnackbar(
             `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
             {variant: "info"}
         );
-        const fetchResponse = await getJson(`/git/fetch-repo/${remoteRepoPath}`,debugRef.current);
-        if (fetchResponse.ok) {
+        const cloneResponse = await getJson(`/git/${getType}-repo/${remoteRepoPath}`,debugRef.current);
+        if (cloneResponse.ok) {
             enqueueSnackbar(
                 `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
                 {variant: "success"}
@@ -95,7 +101,7 @@ function App() {
             setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath]: 'downloaded'}));
         } else {
             enqueueSnackbar(
-                `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)} : ${fetchResponse.error} (${fetchResponse.status})`,
+                `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)} : ${cloneResponse.error} (${cloneResponse.status})`,
                 {variant: "error"}
             );
             setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath]: 'notDownloaded'}))
@@ -150,11 +156,16 @@ function App() {
                 if (!isDownloading) {
                     return <CloudDownload disabled/>
                 }
-                return isDownloading[remoteRepoPath] === "notDownloaded" ?
-                    <CloudDownload onClick={() => handleDownloadClick(params, remoteRepoPath)}/> :
-                    (isDownloading[remoteRepoPath] === "downloading" ?
-                        <CircularProgress size="30px" color="secondary"/> :
-                        <CloudDone color="disabled"/>)
+                if (isDownloading[remoteRepoPath] === "notDownloaded") {
+                    return <CloudDownload onClick={() => handleDownloadClick(params, remoteRepoPath, "clone")}/>;
+                }
+                if (isDownloading[remoteRepoPath] === "updatable") {
+                    return <Update onClick={() => handleDownloadClick(params, remoteRepoPath, "fetch")}/>;
+                }
+                if (isDownloading[remoteRepoPath] === "downloading") {
+                    return <CircularProgress size="30px" color="secondary"/>;
+                }
+                return <CloudDone color="disabled"/>;
             }
         }
     ]
@@ -162,7 +173,7 @@ function App() {
     // Rows for the Data Grid
     const rows = catalog
         .filter(ce => ce.source.startsWith(remoteSource[0]))
-        .filter(ce => ce.flavor && (language === "" || language === ce.language_code))
+        .filter(ce => ce.flavor)
         .map((ce, n) => {
             return {
                 ...ce,
