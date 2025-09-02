@@ -23,6 +23,10 @@
       "es": "fue descargado",
       "fr": "a été téléchargé"
     },
+    "updated": {
+      "en": "has been updated",
+      "fr": "a été remis à jour"
+    },
     "downloading": {
       "en": "Downloading",
       "es": "Descargando",

@@ -94,7 +94,7 @@ function App() {
         const cloneResponse = await getJson(`/git/${getType}-repo/${remoteRepoPath}`,debugRef.current);
         if (cloneResponse.ok) {
             enqueueSnackbar(
-                `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:downloaded", i18nRef.current)}`,
+                `${params.row.abbreviation} ${doI18n(getType === "clone" ? "pages:core-remote-resources:downloaded" : "pages:core-remote-resources:updated", i18nRef.current)}`,
                 {variant: "success"}
             );
             setRemoteSource([...remoteSource]); // Trigger local repo check
