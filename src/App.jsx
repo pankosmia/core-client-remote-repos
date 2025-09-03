@@ -91,8 +91,9 @@ function App() {
             `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
             {variant: "info"}
         );
-        const cloneResponse = await getJson(`/git/${getType}-repo/${remoteRepoPath}`,debugRef.current);
-        if (cloneResponse.ok) {
+        const fetchUrl = getType === "clone" ? `/git/clone-repo/${remoteRepoPath}` : `/git/pull-repo/origin/${remoteRepoPath}`;
+        const fetchResponse = await getJson(fetchUrl, debugRef.current);
+        if (fetchResponse.ok) {
             enqueueSnackbar(
                 `${params.row.abbreviation} ${doI18n(getType === "clone" ? "pages:core-remote-resources:downloaded" : "pages:core-remote-resources:updated", i18nRef.current)}`,
                 {variant: "success"}
@@ -101,7 +102,7 @@ function App() {
             setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath]: 'downloaded'}));
         } else {
             enqueueSnackbar(
-                `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)} : ${cloneResponse.error} (${cloneResponse.status})`,
+                `${params.row.abbreviation} ${doI18n("pages:core-remote-resources:failed", i18nRef.current)} : ${fetchResponse.error} (${fetchResponse.status})`,
                 {variant: "error"}
             );
             setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath]: 'notDownloaded'}))
