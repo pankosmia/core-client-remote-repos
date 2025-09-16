@@ -1,5 +1,5 @@
 import {useState, useEffect, useContext, useCallback} from "react"
-import {Box, Button, ButtonGroup, Grid2, CircularProgress} from "@mui/material";
+import {Box, Button, ButtonGroup, Grid2, CircularProgress, Dialog, DialogContent, DialogActions, AppBar, Toolbar, Typography} from "@mui/material";
 import {DataGrid} from '@mui/x-data-grid';
 import CloudDownload from "@mui/icons-material/CloudDownload";
 import CloudDone from "@mui/icons-material/CloudDone";
@@ -186,43 +186,85 @@ function App() {
             }
         })
 
+    const closeDialog = () => {
+        window.location.href = "/clients/content"
+    }
+
     return (
         <Box className={adjSelectedFontClass}
-             sx={{mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%'}}>
-            <Grid2 container spacing={1} sx={{mx: 2}}>
-                <Grid2 container>
-                    <Grid2 item size={12} sx={{m: 0}}>
-                        <ButtonGroup>
+             sx={{mb: 2, position: 'fixed', top: '64px', bottom: 0, right: 0, overflow: 'scroll', width: '100%'}}
+        >
+            <Dialog
+                fullWidth={true}
+                maxWidth={false}
+                open={true} 
+                onClose={closeDialog}
+                sx={{
+                    '& .MuiDialog-paper': {
+                      maxHeight: '95vh',
+                      minHeight: '95vh'
+                    },
+                  }}
+                slotProps={{
+                    paper: {
+                        component: 'form',
+                    },
+                }}
+            >
+                <AppBar color='secondary' sx={{ position: 'relative', borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
+                    <Toolbar>
+                        <Typography variant="h6" component="div">
+                            {doI18n("pages:core-remote-resources:download_from_internet", i18nRef.current)}
+                        </Typography>
+                    </Toolbar>
+                </AppBar>
+                <DialogContent>
+                    <Grid2 container spacing={1} sx={{mx: 2}}>
+                        <Grid2 container>
+                            <Grid2 item size={12} sx={{m: 0}}>
+                                <ButtonGroup>
+                                    {
+                                        sourceWhitelist.map(
+                                            s => <Button
+                                                variant={s[0] === remoteSource[0] ? "contained" : "outlined"}
+                                                onClick={() => setRemoteSource(s)}
+                                            >
+                                                {s[1]}
+                                            </Button>
+                                        )
+                                    }
+                                </ButtonGroup>
+                            </Grid2>
                             {
-                                sourceWhitelist.map(
-                                    s => <Button
-                                        variant={s[0] === remoteSource[0] ? "contained" : "outlined"}
-                                        onClick={() => setRemoteSource(s)}
-                                    >
-                                        {s[1]}
-                                    </Button>
-                                )
+                                catalog.length > 0 &&
+                                <DataGrid
+                                    initialState={{
+                                        sorting: {
+                                            sortModel: [{ field: 'resourceCode', sort: 'asc' }],
+                                        }
+                                    }}
+                                    rows={rows}
+                                    columns={columns}
+                                    sx={{fontSize: "1rem"}}
+                                />
                             }
-                        </ButtonGroup>
+                            {
+                                catalog.length === 0 && <CircularProgress/>
+                            }
+                        </Grid2>
                     </Grid2>
-                    {
-                        catalog.length > 0 &&
-                        <DataGrid
-                            initialState={{
-                                sorting: {
-                                    sortModel: [{ field: 'resourceCode', sort: 'asc' }],
-                                }
-                            }}
-                            rows={rows}
-                            columns={columns}
-                            sx={{fontSize: "1rem"}}
-                        />
-                    }
-                    {
-                        catalog.length === 0 && <CircularProgress/>
-                    }
-                </Grid2>
-            </Grid2>
+                </DialogContent>
+                <DialogActions>
+                    <Button color="primary" onClick={closeDialog}>
+                        {doI18n("pages:core-remote-resources:cancel", i18nRef.current)}
+                    </Button>
+                    <Button
+                        variant='contained'
+                        color="primary"
+                        onClick={closeDialog}
+                    >{doI18n("pages:core-remote-resources:accept", i18nRef.current)}</Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }
