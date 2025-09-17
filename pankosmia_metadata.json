@@ -61,6 +61,19 @@
       "en": "Download",
       "es": "Descargar",
       "fr": "Télécharger"
+    },
+    "download_from_internet": {
+      "en": "Download from Internet",
+      "es": "Descargar de Internet"
+    },
+    "accept":{
+      "en":"ACCEPT",
+      "fr":"ACCEPTER",
+      "es":"ACEPTAR"
+    },
+    "cancel": {
+      "en": "CANCEL",
+      "es": "CANCELAR"
     }
   }
 }
