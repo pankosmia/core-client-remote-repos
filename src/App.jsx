@@ -5,7 +5,7 @@ import CloudDownload from "@mui/icons-material/CloudDownload";
 import CloudDone from "@mui/icons-material/CloudDone";
 import Update from "@mui/icons-material/Update";
 import {enqueueSnackbar} from "notistack";
-import {getAndSetJson, getJson, i18nContext, doI18n, typographyContext, debugContext} from "pithekos-lib";
+import {getAndSetJson, getJson, i18nContext, doI18n, typographyContext, debugContext, postEmptyJson} from "pithekos-lib";
 import GraphiteTest from "./GraphiteTest";
 
 
@@ -85,17 +85,17 @@ function App() {
         }
     }, [isDownloading, remoteSource, catalog, localRepos])
 
-    const handleDownloadClick = useCallback(async (params, remoteRepoPath, getType) => {
+    const handleDownloadClick = useCallback(async (params, remoteRepoPath, postType) => {
         setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath]: 'downloading'}));
         enqueueSnackbar(
             `${doI18n("pages:core-remote-resources:downloading", i18nRef.current)} ${params.row.abbreviation}`,
             {variant: "info"}
         );
-        const fetchUrl = getType === "clone" ? `/git/clone-repo/${remoteRepoPath}` : `/git/pull-repo/origin/${remoteRepoPath}`;
-        const fetchResponse = await getJson(fetchUrl, debugRef.current);
+        const fetchUrl = postType === "clone" ? `/git/clone-repo/${remoteRepoPath}` : `/git/pull-repo/origin/${remoteRepoPath}`;
+        const fetchResponse = await postEmptyJson(fetchUrl, debugRef.current);
         if (fetchResponse.ok) {
             enqueueSnackbar(
-                `${params.row.abbreviation} ${doI18n(getType === "clone" ? "pages:core-remote-resources:downloaded" : "pages:core-remote-resources:updated", i18nRef.current)}`,
+                `${params.row.abbreviation} ${doI18n(postType === "clone" ? "pages:core-remote-resources:downloaded" : "pages:core-remote-resources:updated", i18nRef.current)}`,
                 {variant: "success"}
             );
             setRemoteSource([...remoteSource]); // Trigger local repo check
