@@ -21,70 +21,59 @@
     "downloaded": {
       "en": "has been downloaded",
       "es": "fue descargado",
-      "fr": "a été téléchargé",
-      "id": "telah diunduh"
+      "fr": "a été téléchargé"
     },
     "updated": {
       "en": "has been updated",
-      "fr": "a été remis à jour",
-      "id": "telah diperbarui"
+      "fr": "a été remis à jour"
     },
     "downloading": {
       "en": "Downloading",
       "es": "Descargando",
-      "fr": "Téléchargement",
-      "id": "Sedang dingunduhkan"
+      "fr": "Téléchargement"
     },
     "failed_to_download": {
       "en": "has failed to download",
       "es": "no se pudo descargar",
-      "fr": "n'a pas pu être téléchargé",
-      "id": "gagal diunduh"
+      "fr": "n'a pas pu être téléchargé"
     },
     "row_resource_code": {
       "en": "Resource Code",
       "es": "Código de Recurso",
-      "fr": "Code Ressource",
-      "id": "Kode Sumber Daya"
+      "fr": "Code Ressource"
     },
     "row_language": {
       "en": "Language",
       "es": "Idioma",
-      "fr": "Langue",
-      "id": "Bahasa"
+      "fr": "Langue"
     },
     "row_description": {
       "en": "Description",
       "es": "Descripción",
-      "fr": "Description",
-      "id": "Deskripsi"
+      "fr": "Description"
     },
     "row_type": {
       "en": "Type",
       "es": "Tipo",
-      "fr": "Type",
-      "id": "Jenis"
+      "fr": "Type"
     },
     "row_download": {
       "en": "Download",
       "es": "Descargar",
-      "fr": "Télécharger",
-      "id": "Unduh"
+      "fr": "Télécharger"
     },
     "download_from_internet": {
       "en": "Download from Internet",
       "es": "Descargar de Internet"
     },
-    "accept": {
-      "en": "ACCEPT",
-      "fr": "ACCEPTER",
-      "es": "ACEPTAR",
-      "id": "TERIMA"
+    "accept":{
+      "en":"ACCEPT",
+      "fr":"ACCEPTER",
+      "es":"ACEPTAR"
     },
     "cancel": {
       "en": "CANCEL",
-      "es": "CANCELAR",
-      "id": "BATAL"
+      "es": "CANCELAR"
     }
   }
 }
