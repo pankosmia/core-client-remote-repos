@@ -7,7 +7,7 @@ createRoot(document.getElementById("root"))
     .render(
         <SpSpa
             requireNet={true}
-            titleKey="pages:core-remote-resources:title"
+            titleKey="pages:content:title"
             currentId="core-remote-resources"
         >
             <App/>
