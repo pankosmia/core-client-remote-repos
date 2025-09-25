@@ -21,59 +21,71 @@
     "downloaded": {
       "en": "has been downloaded",
       "es": "fue descargado",
-      "fr": "a été téléchargé"
+      "fr": "a été téléchargé",
+      "id": "telah diunduh"
     },
     "updated": {
       "en": "has been updated",
-      "fr": "a été remis à jour"
+      "fr": "a été remis à jour",
+      "id": "telah diperbarui"
     },
     "downloading": {
       "en": "Downloading",
       "es": "Descargando",
-      "fr": "Téléchargement"
+      "fr": "Téléchargement",
+      "id": "Sedang dingunduhkan"
     },
     "failed_to_download": {
       "en": "has failed to download",
       "es": "no se pudo descargar",
-      "fr": "n'a pas pu être téléchargé"
+      "fr": "n'a pas pu être téléchargé",
+      "id": "gagal diunduh"
     },
     "row_resource_code": {
       "en": "Resource Code",
       "es": "Código de Recurso",
-      "fr": "Code Ressource"
+      "fr": "Code Ressource",
+      "id": "Kode Sumber Daya"
     },
     "row_language": {
       "en": "Language",
       "es": "Idioma",
-      "fr": "Langue"
+      "fr": "Langue",
+      "id": "Bahasa"
     },
     "row_description": {
       "en": "Description",
       "es": "Descripción",
-      "fr": "Description"
+      "fr": "Description",
+      "id": "Deskripsi"
     },
     "row_type": {
       "en": "Type",
       "es": "Tipo",
-      "fr": "Type"
+      "fr": "Type",
+      "id": "Jenis"
     },
     "row_download": {
       "en": "Download",
       "es": "Descargar",
-      "fr": "Télécharger"
+      "fr": "Télécharger",
+      "id": "Unduh"
     },
     "download_from_internet": {
       "en": "Download from Internet",
-      "es": "Descargar de Internet"
+      "es": "Descargar de Internet",
+      "id": "Unduh melalui Internet"
     },
-    "accept":{
-      "en":"ACCEPT",
-      "fr":"ACCEPTER",
-      "es":"ACEPTAR"
+    "accept": {
+      "en": "ACCEPT",
+      "fr": "ACCEPTER",
+      "es": "ACEPTAR",
+      "id": "TERIMA"
     },
     "cancel": {
       "en": "CANCEL",
-      "es": "CANCELAR"
+      "es": "CANCELAR",
+      "id": "BATAL"
     }
   }
 }
