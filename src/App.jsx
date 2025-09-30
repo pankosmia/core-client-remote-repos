@@ -255,14 +255,11 @@ function App() {
                     </Grid2>
                 </DialogContent>
                 <DialogActions>
-                    <Button color="primary" onClick={closeDialog}>
-                        {doI18n("pages:core-remote-resources:cancel", i18nRef.current)}
-                    </Button>
                     <Button
                         variant='contained'
                         color="primary"
                         onClick={closeDialog}
-                    >{doI18n("pages:core-remote-resources:accept", i18nRef.current)}</Button>
+                    >{doI18n("pages:core-remote-resources:close", i18nRef.current)}</Button>
                 </DialogActions>
             </Dialog>
         </Box>
