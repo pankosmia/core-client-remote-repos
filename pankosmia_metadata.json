@@ -86,6 +86,11 @@
       "en": "CANCEL",
       "es": "CANCELAR",
       "id": "BATAL"
+    },
+    "close": {
+      "en": "CLOSE",
+      "es": "CERRAR",
+      "fr": "FERMER"
     }
   }
 }
