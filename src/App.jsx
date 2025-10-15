@@ -98,7 +98,6 @@ function App() {
                 `${params.row.abbreviation} ${doI18n(postType === "clone" ? "pages:core-remote-resources:downloaded" : "pages:core-remote-resources:updated", i18nRef.current)}`,
                 {variant: "success"}
             );
-            setRemoteSource([...remoteSource]); // Trigger local repo check
             setIsDownloading((isDownloadingCurrent) => ({...isDownloadingCurrent, [remoteRepoPath]: 'downloaded'}));
         } else {
             enqueueSnackbar(
