@@ -20,8 +20,9 @@ function App() {
     const adjSelectedFontClass = isGraphite ? typographyRef.current.font_set : typographyRef.current.font_set.replace(/Pankosmia-AwamiNastaliq(.*)Pankosmia-NotoNastaliqUrdu/ig, 'Pankosmia-NotoNastaliqUrdu');
 
     const sourceWhitelist = [
-        ["git.door43.org/BurritoTruck", "Burrito Truck (Door43)"],
-        ["git.door43.org/uW", "unfoldingWord Burritos (Door43)"],
+        ["git.door43.org/BurritoTruck", "Xenizo curated content (Door43)"],
+        ["git.door43.org/uW", "unfoldingWord curated content (Door43)"],
+        ["git.door43.org/shower", "Aquifer exported content (Door43)"],
     ];
     const [remoteSource, setRemoteSource] = useState(sourceWhitelist[0]);
     const [catalog, setCatalog] = useState([]);
