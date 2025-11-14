@@ -1,5 +1,5 @@
 import {useState, useEffect, useContext, useCallback} from "react"
-import {Box, Button, ButtonGroup, Grid2, CircularProgress, Dialog, DialogContent, DialogActions, AppBar, Toolbar, Typography} from "@mui/material";
+import {Box, Button, ButtonGroup, IconButton, Grid2, CircularProgress, Dialog, DialogContent, DialogActions, AppBar, Toolbar, Typography} from "@mui/material";
 import {DataGrid} from '@mui/x-data-grid';
 import CloudDownload from "@mui/icons-material/CloudDownload";
 import CloudDone from "@mui/icons-material/CloudDone";
@@ -154,19 +154,17 @@ function App() {
 
             renderCell: (params) => {
                 const remoteRepoPath = `${remoteSource[0]}/${params.row.name}`;
-                if (!isDownloading) {
-                    return <CloudDownload disabled/>
-                }
-                if (isDownloading[remoteRepoPath] === "notDownloaded") {
-                    return <CloudDownload onClick={() => handleDownloadClick(params, remoteRepoPath, "clone")}/>;
-                }
-                if (isDownloading[remoteRepoPath] === "updatable") {
-                    return <Update onClick={() => handleDownloadClick(params, remoteRepoPath, "fetch")}/>;
-                }
-                if (isDownloading[remoteRepoPath] === "downloading") {
-                    return <CircularProgress size="30px" color="secondary"/>;
-                }
-                return <CloudDone color="disabled"/>;
+                return <IconButton
+                        disableRipple={isDownloading ? (isDownloading[remoteRepoPath] === "downloading") : false}
+                        disableFocusRipple={isDownloading ? (isDownloading[remoteRepoPath] === "downloading") : false}
+                        disabled={isDownloading ? (isDownloading[remoteRepoPath] === "downloaded") : false}
+                    >
+                        {!isDownloading ? <CloudDownload disabled/> :
+                        (isDownloading[remoteRepoPath] === "notDownloaded") ? <CloudDownload onClick={() => handleDownloadClick(params, remoteRepoPath, "clone")}/> :
+                        (isDownloading[remoteRepoPath] === "updatable") ? <Update onClick={() => handleDownloadClick(params, remoteRepoPath, "fetch")}/> :
+                        (isDownloading[remoteRepoPath] === "downloading") ? <CircularProgress size="30px" color="secondary"/> :
+                        <CloudDone color="disabled"/>}
+                </IconButton>
             }
         }
     ]
