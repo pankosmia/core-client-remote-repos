@@ -1,12 +1,12 @@
 import {useState, useEffect, useContext, useCallback} from "react"
 import {Box, Button, ButtonGroup, IconButton, Grid2, CircularProgress, Dialog, DialogContent, DialogActions, AppBar, Toolbar, Typography} from "@mui/material";
 import {DataGrid} from '@mui/x-data-grid';
-import CloudDownload from "@mui/icons-material/CloudDownload";
-import CloudDone from "@mui/icons-material/CloudDone";
+import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import Update from "@mui/icons-material/Update";
 import {enqueueSnackbar} from "notistack";
 import {getAndSetJson, getJson, i18nContext, doI18n, typographyContext, debugContext, postEmptyJson} from "pithekos-lib";
 import GraphiteTest from "./GraphiteTest";
+import IconDownloaded from "./Svg_IconDownloaded";
 
 
 function App() {
@@ -159,11 +159,11 @@ function App() {
                         disableFocusRipple={isDownloading ? (isDownloading[remoteRepoPath] === "downloading") : false}
                         disabled={isDownloading ? (isDownloading[remoteRepoPath] === "downloaded") : false}
                     >
-                        {!isDownloading ? <CloudDownload disabled/> :
-                        (isDownloading[remoteRepoPath] === "notDownloaded") ? <CloudDownload onClick={() => handleDownloadClick(params, remoteRepoPath, "clone")}/> :
+                        {!isDownloading ? <CloudDownloadOutlinedIcon disabled/> :
+                        (isDownloading[remoteRepoPath] === "notDownloaded") ? <CloudDownloadOutlinedIcon onClick={() => handleDownloadClick(params, remoteRepoPath, "clone")}/> :
                         (isDownloading[remoteRepoPath] === "updatable") ? <Update onClick={() => handleDownloadClick(params, remoteRepoPath, "fetch")}/> :
                         (isDownloading[remoteRepoPath] === "downloading") ? <CircularProgress size="30px" color="secondary"/> :
-                        <CloudDone color="disabled"/>}
+                        <IconDownloaded/>}
                 </IconButton>
             }
         }
