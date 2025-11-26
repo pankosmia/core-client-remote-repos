@@ -41,11 +41,11 @@
       "fr": "n'a pas pu être téléchargé",
       "id": "gagal diunduh"
     },
-    "row_resource_code": {
-      "en": "Resource Code",
-      "es": "Código de Recurso",
-      "fr": "Code Ressource",
-      "id": "Kode Sumber Daya"
+    "row_abbreviation": {
+      "en": "Abbreviation",
+      "es": "@Código de Recurso",
+      "fr": "Abréviation",
+      "id": "@Kode Sumber Daya"
     },
     "row_language": {
       "en": "Language",
@@ -53,11 +53,11 @@
       "fr": "Langue",
       "id": "Bahasa"
     },
-    "row_description": {
-      "en": "Description",
-      "es": "Descripción",
-      "fr": "Description",
-      "id": "Deskripsi"
+    "row_name": {
+      "en": "Name",
+      "es": "@Descripción",
+      "fr": "Nom",
+      "id": "@Deskripsi"
     },
     "row_type": {
       "en": "Type",
@@ -91,6 +91,17 @@
       "en": "CLOSE",
       "es": "CERRAR",
       "fr": "FERMER"
+    },
+    "row_description": {
+      "en": "Description",
+      "fr": "Description"
+    },
+     "row_source": {
+      "en": "Source",
+      "fr": "Source",
+      "es": "Fuente",
+      "id": "Sumber"
     }
+
   }
 }
