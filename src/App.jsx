@@ -112,25 +112,34 @@ function App() {
     // Columns for the Data Grid
     const columns = [
         {
-            field: 'resourceCode',
-            headerName: doI18n("pages:core-remote-resources:row_resource_code", i18nRef.current),
+            field: 'abbreviation',
+            headerName: doI18n("pages:core-remote-resources:row_abbreviation", i18nRef.current),
             flex: 0.5,
             minWidth: 140,
             headerAlign: 'left',
             align: 'left'
         },
         {
+            field: 'name',
+            headerName: doI18n("pages:core-remote-resources:row_name", i18nRef.current),
+            flex: 2,
+            minWidth: 130,
+            headerAlign: 'left',
+            align: 'left'
+        },
+
+        {
             field: 'language',
             headerName: doI18n("pages:core-remote-resources:row_language", i18nRef.current),
-            flex: 0.5,
+            flex: 0.25,
             minWidth: 120,
             headerAlign: 'left',
             align: 'left'
         },
         {
-            field: 'description',
-            headerName: doI18n("pages:core-remote-resources:row_description", i18nRef.current),
-            flex: 2,
+            field: 'source',
+            headerName: doI18n("pages:core-remote-resources:row_source", i18nRef.current),
+            flex: 1.5,
             minWidth: 130,
             headerAlign: 'left',
             align: 'left'
@@ -138,7 +147,7 @@ function App() {
         {
             field: 'type',
             headerName: doI18n("pages:core-remote-resources:row_type", i18nRef.current),
-            flex: 1.5,
+            flex: 1,
             minWidth: 80,
             headerAlign: 'left',
             align: 'left'
@@ -177,9 +186,10 @@ function App() {
             return {
                 ...ce,
                 id: n,
-                resourceCode: ce.abbreviation.toUpperCase(),
+                abbreviation: ce.abbreviation.toUpperCase(),
+                name:ce.description,
+                source:ce.source,
                 language: ce.language_code,
-                description: ce.description,
                 type: doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
             }
         })
@@ -238,7 +248,7 @@ function App() {
                                 <DataGrid
                                     initialState={{
                                         sorting: {
-                                            sortModel: [{ field: 'resourceCode', sort: 'asc' }],
+                                            sortModel: [{ field: 'abbreviation', sort: 'asc' }],
                                         }
                                     }}
                                     rows={rows}
