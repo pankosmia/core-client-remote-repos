@@ -112,7 +112,7 @@ function App() {
     // Columns for the Data Grid
     const columns = [
         {
-            field: 'abbreviation',
+            field: 'resourceCode',
             headerName: doI18n("pages:core-remote-resources:row_abbreviation", i18nRef.current),
             flex: 0.5,
             minWidth: 140,
@@ -120,7 +120,7 @@ function App() {
             align: 'left'
         },
         {
-            field: 'name',
+            field: 'description',
             headerName: doI18n("pages:core-remote-resources:row_name", i18nRef.current),
             flex: 2,
             minWidth: 130,
@@ -186,8 +186,8 @@ function App() {
             return {
                 ...ce,
                 id: n,
-                abbreviation: ce.abbreviation.toUpperCase(),
-                name:ce.description,
+                resourceCode: ce.abbreviation.toUpperCase(),
+                description:ce.description,
                 source:ce.source,
                 language: ce.language_code,
                 type: doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
@@ -248,7 +248,7 @@ function App() {
                                 <DataGrid
                                     initialState={{
                                         sorting: {
-                                            sortModel: [{ field: 'abbreviation', sort: 'asc' }],
+                                            sortModel: [{ field: 'resourceCode', sort: 'asc' }],
                                         }
                                     }}
                                     rows={rows}
@@ -273,5 +273,4 @@ function App() {
         </Box>
     );
 }
-
 export default App;
