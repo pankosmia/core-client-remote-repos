@@ -15,6 +15,7 @@ function App() {
     const {i18nRef} = useContext(i18nContext);
     const {debugRef} = useContext(debugContext);
     const [languageLookup, setLanguageLookup] = useState([]);
+    const [isoThreeLookup, setIsoThreeLookup] = useState([]);
 
     const isGraphite = GraphiteTest()
     /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
@@ -66,6 +67,13 @@ function App() {
       fetch('/app-resources/lookups/languages.json') // ISO_639-1 plus grc
         .then(r => r.json())
         .then(data => setLanguageLookup(data));
+    }, []);
+
+    useEffect(() => {
+      fetch('/app-resources/lookups/iso639-3.json') // ISO_639-3 2025-02-21 from https://hisregistries.org/rol/ plus zht, zhs, nep
+
+        .then(r => r.json())
+        .then(data => setIsoThreeLookup(data));
     }, []);
 
     useEffect(() => {
@@ -139,7 +147,7 @@ function App() {
             field: 'language',
             headerName: doI18n("pages:core-remote-resources:row_language", i18nRef.current),
             flex: 0.25,
-            minWidth: 120,
+            minWidth: 175,
             headerAlign: 'left',
             align: 'left'
         },
@@ -197,6 +205,7 @@ function App() {
                 description:ce.description,
                 source:ce.source,
                 language: languageLookup.find(x => x?.id === ce.language_code)?.en ??
+                          isoThreeLookup.find(x => x?.id === ce.language_code)?.en ??
                           ce.language_code,
                 type: doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
             }
