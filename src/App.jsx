@@ -14,6 +14,7 @@ function App() {
     const {typographyRef} = useContext(typographyContext);
     const {i18nRef} = useContext(i18nContext);
     const {debugRef} = useContext(debugContext);
+    const [languageLookup, setLanguageLookup] = useState([]);
 
     const isGraphite = GraphiteTest()
     /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
@@ -60,6 +61,12 @@ function App() {
         },
         [remoteSource]
     );
+
+    useEffect(() => {
+      fetch('/app-resources/lookups/languages.json') // ISO_639-1 plus grc
+        .then(r => r.json())
+        .then(data => setLanguageLookup(data));
+    }, []);
 
     useEffect(() => {
         if (!isDownloading && (catalog.length > 0) && localRepos) {
@@ -189,7 +196,8 @@ function App() {
                 resourceCode: ce.abbreviation.toUpperCase(),
                 description:ce.description,
                 source:ce.source,
-                language: ce.language_code,
+                language: languageLookup.find(x => x?.id === ce.language_code)?.en ??
+                          ce.language_code,
                 type: doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
             }
         })
