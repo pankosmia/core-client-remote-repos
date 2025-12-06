@@ -205,7 +205,7 @@ function App() {
                 description:ce.description,
                 source:ce.source,
                 language: languageLookup.find(x => x?.id === ce.language_code)?.en ??
-                          isoThreeLookup.find(x => x?.id === ce.language_code)?.en ??
+                          isoThreeLookup?.[ce.language_code]?.en ??
                           ce.language_code,
                 type: doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
             }
