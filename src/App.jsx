@@ -14,7 +14,7 @@ function App() {
     const {typographyRef} = useContext(typographyContext);
     const {i18nRef} = useContext(i18nContext);
     const {debugRef} = useContext(debugContext);
-    const [languageLookup, setLanguageLookup] = useState([]);
+    const [isoOneToThreeLookup, setIsoOneToThreeLookup] = useState([]);
     const [isoThreeLookup, setIsoThreeLookup] = useState([]);
 
     const isGraphite = GraphiteTest()
@@ -64,9 +64,9 @@ function App() {
     );
 
     useEffect(() => {
-      fetch('/app-resources/lookups/languages.json') // ISO_639-1 plus grc
+      fetch('/app-resources/lookups/iso639-1-to-3.json') // ISO_639-1 codes mapped to ISO_639-3 codes
         .then(r => r.json())
-        .then(data => setLanguageLookup(data));
+        .then(data => setIsoOneToThreeLookup(data));
     }, []);
 
     useEffect(() => {
@@ -204,8 +204,7 @@ function App() {
                 resourceCode: ce.abbreviation.toUpperCase(),
                 description:ce.description,
                 source:ce.source,
-                language: languageLookup.find(x => x?.id === ce.language_code)?.en ??
-                          isoThreeLookup?.[ce.language_code]?.en ??
+                language: isoThreeLookup?.[ isoOneToThreeLookup[ce.language_code] ?? ce.language_code ]?.en ??
                           ce.language_code,
                 type: doI18n(`flavors:names:${ce.flavor_type}/${ce.flavor}`, i18nRef.current)
             }
