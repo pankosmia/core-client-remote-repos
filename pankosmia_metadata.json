@@ -13,10 +13,10 @@
       "id": "Sumber Daya di Server"
     },
     "summary": {
-      "ar": "ابحث وقم بتنزيل الموارد الموجودة في الموقع الالكتروني لبنكوسميا.",
-      "en": "Search and download remote resources from Pankosmia servers.",
-      "fr": "Chercher et télécharger des ressources depuis des serveurs Pankosmia.",
-      "id": "Cari dan unduh sumber daya jarak jauh dari server-server Pankosmia."
+      "ar": "@ابحث وقم بتنزيل الموارد الموجودة في الموقع الالكتروني لبنكوسميا.",
+      "en": "Search and download documents from internet.",
+      "fr": "Chercher et télécharger des documents depuis internet.",
+      "id": "@Cari dan unduh sumber daya jarak jauh dari server-server Pankosmia."
     },
     "downloaded": {
       "en": "has been downloaded",
@@ -26,7 +26,7 @@
     },
     "updated": {
       "en": "has been updated",
-      "fr": "a été remis à jour",
+      "fr": "a été mis à jour",
       "id": "telah diperbarui"
     },
     "downloading": {
@@ -36,10 +36,10 @@
       "id": "Sedang dingunduhkan"
     },
     "failed_to_download": {
-      "en": "has failed to download",
-      "es": "no se pudo descargar",
+      "en": "could not be downloaded",
+      "es": "@no se pudo descargar",
       "fr": "n'a pas pu être téléchargé",
-      "id": "gagal diunduh"
+      "id": "@gagal diunduh"
     },
     "row_abbreviation": {
       "en": "Abbreviation",
@@ -55,9 +55,9 @@
     },
     "row_name": {
       "en": "Name",
-      "es": "@Descripción",
+      "es": "Nombre",
       "fr": "Nom",
-      "id": "@Deskripsi"
+      "id": "Nama"
     },
     "row_type": {
       "en": "Type",
@@ -72,29 +72,33 @@
       "id": "Unduh"
     },
     "download_from_internet": {
-      "en": "Download from Internet",
-      "es": "Descargar de Internet",
-      "id": "Unduh melalui Internet"
+      "en": "Download from internet",
+      "es": "Descargar de internet",
+      "fr": "Télécharger depuis internet",
+      "id": "Unduh melalui internet"
     },
     "accept": {
-      "en": "ACCEPT",
-      "fr": "ACCEPTER",
-      "es": "ACEPTAR",
-      "id": "TERIMA"
+      "en": "Accept",
+      "es": "Aceptar",
+      "fr": "Accepter",
+      "id": "Terima"
     },
     "cancel": {
-      "en": "CANCEL",
-      "es": "CANCELAR",
-      "id": "BATAL"
+      "en": "Cancel",
+      "es": "Cancelar",
+      "fr": "Annuler",
+      "id": "Batal"
     },
     "close": {
-      "en": "CLOSE",
-      "es": "CERRAR",
-      "fr": "FERMER"
+      "en": "Close",
+      "es": "Cerrar",
+      "fr": "Fermer"
     },
     "row_description": {
       "en": "Description",
-      "fr": "Description"
+      "es": "Descripción",
+      "fr": "Description",
+      "id": "Deskripsi"
     },
      "row_source": {
       "en": "Source",
