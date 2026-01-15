@@ -7,6 +7,7 @@ import {enqueueSnackbar} from "notistack";
 import {getAndSetJson, getJson, i18nContext, doI18n, typographyContext, debugContext, postEmptyJson} from "pithekos-lib";
 import GraphiteTest from "./GraphiteTest";
 import IconDownloaded from "./Svg_IconDownloaded";
+import {PanTable} from 'pankosmia-rcl';
 
 
 function App() {
@@ -131,16 +132,18 @@ function App() {
             headerName: doI18n("pages:core-remote-resources:row_abbreviation", i18nRef.current),
             flex: 0.5,
             minWidth: 140,
-            headerAlign: 'left',
-            align: 'left'
+            /* headerAlign: 'left', */
+            alignRight: false,
+            numeric: false,
         },
         {
             field: 'description',
             headerName: doI18n("pages:core-remote-resources:row_name", i18nRef.current),
             flex: 2,
             minWidth: 130,
-            headerAlign: 'left',
-            align: 'left'
+            /* headerAlign: 'left', */
+            alignRight: false,
+            numeric: false,
         },
 
         {
@@ -148,24 +151,27 @@ function App() {
             headerName: doI18n("pages:core-remote-resources:row_language", i18nRef.current),
             flex: 0.25,
             minWidth: 175,
-            headerAlign: 'left',
-            align: 'left'
+            /* headerAlign: 'left', */
+            alignRight: false,
+            numeric: false,
         },
         {
             field: 'source',
             headerName: doI18n("pages:core-remote-resources:row_source", i18nRef.current),
             flex: 1.5,
             minWidth: 130,
-            headerAlign: 'left',
-            align: 'left'
+            /* headerAlign: 'left', */
+            alignRight: false,
+            numeric: false,
         },
         {
             field: 'type',
             headerName: doI18n("pages:core-remote-resources:row_type", i18nRef.current),
             flex: 1,
             minWidth: 80,
-            headerAlign: 'left',
-            align: 'left'
+            /* headerAlign: 'left', */
+            alignRight: false,
+            numeric: false,
         },
         {
             field: 'download',
@@ -173,8 +179,9 @@ function App() {
             headerName: doI18n("pages:core-remote-resources:row_download", i18nRef.current),
             flex: 0.5,
             minWidth: 120,
-            headerAlign: 'left',
-            align: 'left',
+            /* headerAlign: 'left', */
+            alignRight: false,
+            numeric: false,
 
             renderCell: (params) => {
                 const remoteRepoPath = `${remoteSource[0]}/${params.row.name}`;
@@ -213,6 +220,7 @@ function App() {
     const closeDialog = () => {
         window.location.href = "/clients/content"
     }
+/*     console.log(JSON.stringify(rows)); */
 
     return (
         <Box className={adjSelectedFontClass}
@@ -261,7 +269,14 @@ function App() {
                             </Grid2>
                             {
                                 catalog.length > 0 &&
-                                <DataGrid
+                               <Grid2 item size={12} sx={{m:0, height: "100%"}}>
+                                    <PanTable
+                                        columns={columns}
+                                        rows={rows}
+                                    />
+                               </Grid2>
+                            }
+                            {/* <DataGrid
                                     initialState={{
                                         sorting: {
                                             sortModel: [{ field: 'resourceCode', sort: 'asc' }],
@@ -269,9 +284,9 @@ function App() {
                                     }}
                                     rows={rows}
                                     columns={columns}
-                                    sx={{fontSize: "1rem"}}
-                                />
-                            }
+                                    
+                                /> 
+                            */}
                             {
                                 catalog.length === 0 && <CircularProgress/>
                             }
