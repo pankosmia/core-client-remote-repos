@@ -2,7 +2,7 @@ import { useContext } from "react";
 
 import { useMemo } from "react";
 import { doI18n } from "pithekos-lib";
-
+import { DialogContent } from "@mui/material";
 import { PanDownload, i18nContext, PanDialog } from "pankosmia-rcl";
 
 function App() {
@@ -34,11 +34,14 @@ function App() {
       isOpen={true}
       closeFn={closeDialog}
     >
-      <PanDownload
-        sources={sourceWhitelist}
-        defaultFilterProps={defaultFilterProps}
-        sx={{ flex: 1 }}
-      />
+      <DialogContent>
+        <PanDownload
+          sources={sourceWhitelist}
+          showColumnFilters={true}
+          defaultFilterProps={defaultFilterProps}
+          sx={{ flex: 1 }}
+        />
+      </DialogContent>
     </PanDialog>
   );
 }
