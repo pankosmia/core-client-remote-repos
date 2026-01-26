@@ -1,15 +1,21 @@
-import {createRoot} from "react-dom/client";
-import {SpSpa} from "pithekos-lib";
+import { createRoot } from "react-dom/client";
 import App from "./App";
-import './index.css';
+import "./index.css";
+import { SpaContainer } from "pankosmia-rcl";
+import { createHashRouter, RouterProvider } from "react-router-dom";
+const router = createHashRouter([
+  {
+    path: "/",
+    element: <App />,
+  },
+]);
 
-createRoot(document.getElementById("root"))
-    .render(
-        <SpSpa
-            requireNet={true}
-            titleKey="pages:content:title"
-            currentId="core-remote-resources"
-        >
-            <App/>
-        </SpSpa>
-    );
+createRoot(document.getElementById("root")).render(
+  <SpaContainer
+    requireNet={true}
+    titleKey="pages:content:title"
+    currentId="core-remote-resources"
+  >
+    <RouterProvider router={router} />
+  </SpaContainer>
+);
