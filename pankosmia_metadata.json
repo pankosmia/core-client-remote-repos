@@ -37,13 +37,13 @@
     },
     "failed_to_download": {
       "en": "could not be downloaded",
-      "es": "@no se pudo descargar",
+      "es": "no se pudo descargar",
       "fr": "n'a pas pu être téléchargé",
       "id": "@gagal diunduh"
     },
     "row_abbreviation": {
       "en": "Abbreviation",
-      "es": "@Código de Recurso",
+      "es": "Abreviación",
       "fr": "Abréviation",
       "id": "@Kode Sumber Daya"
     },
