@@ -180,7 +180,7 @@ function App() {
       <Tabs value={value} onChange={handleChange}>
         <Tab
           label={`${doI18n(
-            "pages:core-remote-resources:currated_content",
+            "pages:core-remote-resources:curated_content",
             i18nRef.current,
           )}`}
         />
