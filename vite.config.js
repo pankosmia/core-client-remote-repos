@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,12 +9,12 @@ export default defineConfig({
     strictPort: true,
     host: true,
     cors: true,
-    origin: 'http://localhost:8000',
+    origin: "http://localhost:8000",
   },
   build: {
-    outDir: 'build',
+    outDir: "build",
     emptyOutDir: true,
-    
+    sourcemap: true,
   },
-  base: '/clients/download/'
-})
+  base: "/clients/download/",
+});
