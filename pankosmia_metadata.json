@@ -3,8 +3,21 @@
   "require": {
     "net": true
   },
+  "minServerVersion": "0.13.0",
   "exclude_from_menu": true,
   "exclude_from_dashboard": true,
+  "endpoints": {
+    "remote_repos": {
+      "download_resources": [
+        {
+          "doc": "download ressources page",
+          "placeHolders": {},
+          "label": "",
+          "url": ""
+        }
+      ]
+    }
+  },
   "i18n": {
     "title": {
       "ar": "موارد للتنزيل",
@@ -100,12 +113,17 @@
       "fr": "Description",
       "id": "Deskripsi"
     },
-     "row_source": {
+    "row_source": {
       "en": "Source",
       "fr": "Source",
       "es": "Fuente",
       "id": "Sumber"
+    },
+    "currated_content": {
+      "en": "Currated content"
+    },
+    "legacy_content":{
+      "en":"legacy content"
     }
-
   }
 }
