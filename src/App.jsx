@@ -206,7 +206,7 @@ function App() {
           </Box>
         )}
         {value === 1 && (
-          <Box sx={{ height: "calc(100vh - 340px)", overflow: "hidden" }}>
+          <Box sx={{ height: "calc(100vh - 229px)", overflow: "hidden" }}>
             <TextField
               fullWidth
               label="Username"
