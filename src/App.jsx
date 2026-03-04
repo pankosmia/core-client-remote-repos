@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 
 import { useMemo, useState } from "react";
 import { doI18n, postEmptyJson } from "pithekos-lib";
@@ -9,6 +9,7 @@ import {
   TextField,
   Button,
   Box,
+  Chip,
 } from "@mui/material";
 import {
   PanDownload,
@@ -18,15 +19,16 @@ import {
   clientInterfacesContext,
 } from "pankosmia-rcl";
 import { enqueueSnackbar } from "notistack";
+import { Check, CorporateFare, Login, PermIdentity } from "@mui/icons-material";
 
 function findEndpoint(config, targetKey, typeContent) {
   for (const topLevelKey of Object.keys(config)) {
     const result = walk(
       config[topLevelKey],
       topLevelKey,
-      null,              // parentKey (none at start)
+      null, // parentKey (none at start)
       targetKey,
-      typeContent
+      typeContent,
     );
     if (result) return result;
   }
@@ -45,7 +47,7 @@ function walk(node, rootKey, parentKey, targetKey, typeContent) {
   ) {
     return {
       rootKey,
-      typeContent,        // 👈 now explicit
+      typeContent, // 👈 now explicit
       endpoint: targetKey,
       url: node[targetKey][0].url,
     };
@@ -72,8 +74,20 @@ function App() {
   const [username, setUsername] = useState(null);
   const [inputValue, setInputValue] = useState("");
   const [userWhitelist, setUserWhitelist] = useState(null);
-
+  const [selectedChips, setSelectedChips] = useState(0);
   const [urlLegacyContent, setUrlLegacyContent] = useState("");
+  const filterRef = useRef(null);
+  const [filterHeight, setFilterHeight] = useState(0);
+  useEffect(() => {
+    if (!filterRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setFilterHeight(entry.contentRect.height);
+      }
+    });
+    observer.observe(filterRef.current);
+    return () => observer.disconnect();
+  }, [value]);
 
   const sourceWhitelist = useMemo(() => {
     return [
@@ -95,6 +109,11 @@ function App() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+  console.log(inputValue);
+  useEffect(() => {
+    setUsername("");
+    setInputValue("");
+  }, [selectedChips]);
 
   async function DowloadLegacy(params, remoteRepoPath, postType) {
     let fetchResponse;
@@ -159,7 +178,7 @@ function App() {
         let result = findEndpoint(
           clientInterfacesRef.current,
           "create_document",
-          "textTranslation"
+          "textTranslation",
         );
         console.log(result);
         if (result) {
@@ -176,6 +195,7 @@ function App() {
       )}
       isOpen={true}
       closeFn={closeDialog}
+      size="lg"
     >
       <Tabs value={value} onChange={handleChange}>
         <Tab
@@ -187,17 +207,17 @@ function App() {
         {urlLegacyContent && (
           <Tab
             label={`${doI18n(
-              "pages:core-remote-resources:legacy_content",
+              "pages:core-remote-resources:browse_door43",
               i18nRef.current,
             )}`}
           />
         )}
       </Tabs>
-      <DialogContent>
+      <DialogContent sx={{ overflow: "hidden" }}>
         {value === 0 && (
-          <Box sx={{ height: "calc(100vh - 229px)", overflow: "hidden" }}>
+          <Box sx={{ height: "calc(100vh - 208px)", overflow: "hidden" }}>
             <PanDownload
-              downloadedType="burrito"
+              downloadedType="org"
               downloadFunction={DowloadBurrito}
               sources={sourceWhitelist}
               showColumnFilters={defaultFilterProps}
@@ -206,28 +226,138 @@ function App() {
           </Box>
         )}
         {value === 1 && (
-          <Box sx={{ height: "calc(100vh - 340px)", overflow: "hidden" }}>
-            <TextField
-              fullWidth
-              label="Username"
-              variant="outlined"
-              value={username}
-              sx={{ marginTop: 1 }}
-              onChange={(e) => setInputValue(e.target.value)}
-            />
+          <>
+            <Box sx={{ overflow: "hidden" }} ref={filterRef}>
+              <Box>
+                <Chip
+                  variant={selectedChips === 0 ? "filled" : "outlined"}
+                  onClick={() => {
+                    setSelectedChips(0);
+                  }}
+                  color="primary"
+                  icon={selectedChips === 0 ? <Check /> : <PermIdentity />}
+                  sx={
+                    selectedChips === 1
+                      ? {
+                          borderTopRightRadius: 0,
+                          borderBottomRightRadius: 0,
+                          borderRightWidth: 0,
+                        }
+                      : { borderTopRightRadius: 0, borderBottomRightRadius: 0 }
+                  }
+                  label={doI18n(
+                    "pages:core-remote-resources:username",
+                    i18nRef.current,
+                  )}
+                />
+                <Chip
+                  variant={selectedChips === 1 ? "filled" : "outlined"}
+                  onClick={() => {
+                    setSelectedChips(1);
+                  }}
+                  icon={selectedChips === 1 ? <Check /> : <CorporateFare />}
+                  color="primary"
+                  sx={
+                    selectedChips === 0
+                      ? {
+                          borderTopLeftRadius: 0,
+                          borderBottomLeftRadius: 0,
+                          padding: -1,
+                          borderTopRightRadius: 0,
+                          borderBottomRightRadius: 0,
+                          borderRightWidth: 0,
+                          borderLeftWidth: 0,
+                        }
+                      : {
+                          borderTopLeftRadius: 0,
+                          borderBottomLeftRadius: 0,
+                          borderTopRightRadius: 0,
+                          borderBottomRightRadius: 0,
+                          borderRightWidth: 0,
+                          borderLeftWidth: 0,
 
-            <Button onClick={handleSetUsername}>Search</Button>
+                          padding: -1,
+                        }
+                  }
+                  label={doI18n(
+                    "pages:core-remote-resources:organization",
+                    i18nRef.current,
+                  )}
+                />
+                <Chip
+                  variant={"filled"}
+                  disabled={true}
+                  onClick={() => {
+                    setSelectedChips(2);
+                  }}
+                  icon={selectedChips === 2 ? <Check /> : <Login />}
+                  color="primary"
+                  sx={
+                    selectedChips === 1
+                      ? {
+                          borderTopLeftRadius: 0,
+                          borderBottomLeftRadius: 0,
+                          borderLeftWidth: 0,
+                        }
+                      : {
+                          borderTopLeftRadius: 0,
+                          borderBottomLeftRadius: 0,
+                        }
+                  }
+                  label={doI18n(
+                    "pages:core-remote-resources:my_account",
+                    i18nRef.current,
+                  )}
+                />
+              </Box>
+              <TextField
+                fullWidth
+                label={
+                  selectedChips === 0
+                    ? doI18n(
+                        "pages:core-remote-resources:username",
+                        i18nRef.current,
+                      )
+                    : selectedChips === 1
+                      ? doI18n(
+                          "pages:core-remote-resources:organization",
+                          i18nRef.current,
+                        )
+                      : doI18n(
+                          "pages:core-remote-resources:my_account",
+                          i18nRef.current,
+                        )
+                }
+                variant="outlined"
+                value={inputValue}
+                sx={{ marginTop: 2 }}
+                onChange={(e) => setInputValue(e.target.value)}
+              />
+
+              <Button onClick={() => handleSetUsername()}>Search</Button>
+            </Box>
 
             {userWhitelist && (
-              <PanDownload
-                downloadedType="legacy"
-                downloadFunction={DowloadLegacy}
-                sources={userWhitelist}
-                showColumnFilters={defaultFilterProps}
-                sx={{ flex: 1 }}
-              />
+              <Box
+                sx={{
+                  height: `calc(100vh - ${filterHeight + 208}px)`,
+                  overflow: "hidden",
+                }}
+              >
+                <PanDownload
+                  downloadedType={
+                    selectedChips === 0 || selectedChips === 2 ? "user" : "org"
+                  }
+                  
+                  downloadFunction={DowloadBurrito}
+                  downloadLegacyFunction={DowloadLegacy}
+                  sources={userWhitelist}
+                  showColumnFilters={defaultFilterProps}
+                  sx={{ flex: 1 }}
+                />
+              </Box>
             )}
-          </Box>
+          </>
         )}
       </DialogContent>
     </PanDialog>
