@@ -217,7 +217,7 @@ function App() {
         {value === 0 && (
           <Box sx={{ height: "calc(100vh - 208px)", overflow: "hidden" }}>
             <PanDownload
-              downloadedType="burrito"
+              downloadedType="org"
               downloadFunction={DowloadBurrito}
               sources={sourceWhitelist}
               showColumnFilters={defaultFilterProps}
