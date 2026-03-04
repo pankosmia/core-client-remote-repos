@@ -195,6 +195,7 @@ function App() {
       )}
       isOpen={true}
       closeFn={closeDialog}
+      fullWidth={true}
     >
       <Tabs value={value} onChange={handleChange}>
         <Tab
@@ -329,7 +330,7 @@ function App() {
                 }
                 variant="outlined"
                 value={inputValue}
-                sx={{ marginTop: 1 }}
+                sx={{ marginTop: 2 }}
                 onChange={(e) => setInputValue(e.target.value)}
               />
 
@@ -347,6 +348,7 @@ function App() {
                   downloadedType={
                     selectedChips === 0 || selectedChips === 2 ? "user" : "org"
                   }
+                  
                   downloadFunction={DowloadBurrito}
                   downloadLegacyFunction={DowloadLegacy}
                   sources={userWhitelist}
