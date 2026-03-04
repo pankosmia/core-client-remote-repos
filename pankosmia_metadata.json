@@ -122,8 +122,17 @@
     "currated_content": {
       "en": "Currated content"
     },
-    "legacy_content":{
-      "en":"legacy content"
+    "browse_door43": {
+      "en": "Browse Door43"
+    },
+    "username": {
+      "en": "Username"
+    },
+    "organization": {
+      "en": "Organization"
+    },
+    "my_account": {
+      "en": "My account"
     }
   }
 }
