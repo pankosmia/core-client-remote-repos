@@ -195,7 +195,7 @@ function App() {
       )}
       isOpen={true}
       closeFn={closeDialog}
-      fullWidth={true}
+      size="lg"
     >
       <Tabs value={value} onChange={handleChange}>
         <Tab

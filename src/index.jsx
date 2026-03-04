@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { SpaContainer } from "pankosmia-rcl";
+import { SpSpa } from "pankosmia-rcl";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 const router = createHashRouter([
   {
@@ -11,11 +11,11 @@ const router = createHashRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <SpaContainer
+  <SpSpa
     requireNet={true}
     titleKey="pages:content:title"
     currentId="core-remote-resources"
   >
     <RouterProvider router={router} />
-  </SpaContainer>
+  </SpSpa>
 );
