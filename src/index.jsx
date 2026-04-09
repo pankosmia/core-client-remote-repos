@@ -17,5 +17,5 @@ createRoot(document.getElementById("root")).render(
     currentId="core-remote-resources"
   >
     <RouterProvider router={router} />
-  </SpSpa>
+  </SpSpa>,
 );

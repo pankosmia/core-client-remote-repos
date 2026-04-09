@@ -20,7 +20,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
-    "react-scripts": "^0.0.0",
+    "husky": "^9.1.7",
+    "prettier": "3.8.1",
     "vite": "^6.0.7"
   },
   "peerDependencies": {
@@ -28,10 +29,10 @@
     "react-dom": "^17.0.0 || ^18.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
     "build": "vite build",
     "build:vite": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "prepare": "husky"
   },
   "eslintConfig": {
     "extends": [

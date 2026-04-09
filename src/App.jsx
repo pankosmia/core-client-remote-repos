@@ -348,7 +348,6 @@ function App() {
                   downloadedType={
                     selectedChips === 0 || selectedChips === 2 ? "user" : "org"
                   }
-                  
                   downloadFunction={DowloadBurrito}
                   downloadLegacyFunction={DowloadLegacy}
                   sources={userWhitelist}
