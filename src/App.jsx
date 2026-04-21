@@ -397,8 +397,7 @@ function App() {
                   downloadLegacyFunction={DowloadLegacy}
                   sources={userWhitelist}
                   showColumnFilters={defaultFilterProps}
-                  /* showFilterButtons={false} */
-                  // Awaiting pankosmia-rcl update
+                  showFilterButtons={false}
                   sx={{ flex: 1 }}
                 />
               </Box>
@@ -412,7 +411,7 @@ function App() {
           "pages:core-remote-resources:close",
           i18nRef.current,
         )}
-        actionVariant="filled"
+        actionVariant="contained"
       />
     </PanDialog>
   );
