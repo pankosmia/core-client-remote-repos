@@ -336,19 +336,10 @@ function App() {
                 <TextField
                   label={
                     selectedChips === 0
-                      ? doI18n(
-                          "pages:core-remote-resources:username",
-                          i18nRef.current,
-                        )
+                      ? `${doI18n("pages:core-remote-resources:username", i18nRef.current)} *`
                       : selectedChips === 1
-                        ? doI18n(
-                            "pages:core-remote-resources:organization",
-                            i18nRef.current,
-                          )
-                        : doI18n(
-                            "pages:core-remote-resources:my_account",
-                            i18nRef.current,
-                          )
+                        ? `${doI18n("pages:core-remote-resources:organization", i18nRef.current)} *`
+                        : `${doI18n("pages:core-remote-resources:my_account", i18nRef.current)} *`
                   }
                   color="secondary"
                   size="small"
