@@ -133,6 +133,14 @@
     },
     "my_account": {
       "en": "My account"
+    },
+    "required_for_results": {
+      "en": "Required to display results",
+      "es": "Es necesario para mostrar los resultados"
+    },
+    "search": {
+      "en": "Search",
+      "es": "Buscar"
     }
   }
 }
