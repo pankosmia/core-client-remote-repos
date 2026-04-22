@@ -10,11 +10,13 @@ import {
   Button,
   Box,
   Chip,
+  Stack,
 } from "@mui/material";
 import {
   PanDownload,
   i18nContext,
   PanDialog,
+  PanDialogActions,
   debugContext,
   clientInterfacesContext,
 } from "pankosmia-rcl";
@@ -78,6 +80,8 @@ function App() {
   const [urlLegacyContent, setUrlLegacyContent] = useState("");
   const filterRef = useRef(null);
   const [filterHeight, setFilterHeight] = useState(0);
+  const [showTable, setShowTable] = useState(false);
+
   useEffect(() => {
     if (!filterRef.current) return;
     const observer = new ResizeObserver((entries) => {
@@ -108,6 +112,7 @@ function App() {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    setShowTable(false);
   };
   console.log(inputValue);
   useEffect(() => {
@@ -197,7 +202,13 @@ function App() {
       closeFn={closeDialog}
       size="lg"
     >
-      <Tabs value={value} onChange={handleChange}>
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        textColor="secondary"
+        indicatorColor="secondary"
+        sx={{ mt: 2, mx: 2 }}
+      >
         <Tab
           label={`${doI18n(
             "pages:core-remote-resources:curated_content",
@@ -232,9 +243,12 @@ function App() {
                 <Chip
                   variant={selectedChips === 0 ? "filled" : "outlined"}
                   onClick={() => {
-                    setSelectedChips(0);
+                    if (selectedChips !== 0) {
+                      setShowTable(false);
+                      setSelectedChips(0);
+                    }
                   }}
-                  color="primary"
+                  color="secondary"
                   icon={selectedChips === 0 ? <Check /> : <PermIdentity />}
                   sx={
                     selectedChips === 1
@@ -253,10 +267,13 @@ function App() {
                 <Chip
                   variant={selectedChips === 1 ? "filled" : "outlined"}
                   onClick={() => {
-                    setSelectedChips(1);
+                    if (selectedChips !== 1) {
+                      setShowTable(false);
+                      setSelectedChips(1);
+                    }
                   }}
                   icon={selectedChips === 1 ? <Check /> : <CorporateFare />}
-                  color="primary"
+                  color="secondary"
                   sx={
                     selectedChips === 0
                       ? {
@@ -285,13 +302,13 @@ function App() {
                   )}
                 />
                 <Chip
-                  variant={"filled"}
+                  variant={selectedChips === 2 ? "filled" : "outlined"}
                   disabled={true}
                   onClick={() => {
                     setSelectedChips(2);
                   }}
                   icon={selectedChips === 2 ? <Check /> : <Login />}
-                  color="primary"
+                  color="secondary"
                   sx={
                     selectedChips === 1
                       ? {
@@ -310,34 +327,53 @@ function App() {
                   )}
                 />
               </Box>
-              <TextField
-                fullWidth
-                label={
-                  selectedChips === 0
-                    ? doI18n(
-                        "pages:core-remote-resources:username",
-                        i18nRef.current,
-                      )
-                    : selectedChips === 1
-                      ? doI18n(
-                          "pages:core-remote-resources:organization",
-                          i18nRef.current,
-                        )
-                      : doI18n(
-                          "pages:core-remote-resources:my_account",
-                          i18nRef.current,
-                        )
-                }
-                variant="outlined"
-                value={inputValue}
-                sx={{ marginTop: 2 }}
-                onChange={(e) => setInputValue(e.target.value)}
-              />
-
-              <Button onClick={() => handleSetUsername()}>Search</Button>
+              <Stack
+                direction="row"
+                spacing={0.5}
+                alignItems="flex-start"
+                sx={{ mt: 2 }}
+              >
+                <TextField
+                  label={
+                    selectedChips === 0
+                      ? `${doI18n("pages:core-remote-resources:username", i18nRef.current)} *`
+                      : selectedChips === 1
+                        ? `${doI18n("pages:core-remote-resources:organization", i18nRef.current)} *`
+                        : `${doI18n("pages:core-remote-resources:my_account", i18nRef.current)} *`
+                  }
+                  color="secondary"
+                  size="small"
+                  variant="outlined"
+                  value={inputValue}
+                  sx={{ marginTop: 2 }}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      handleSetUsername();
+                      setShowTable(true);
+                    }
+                  }}
+                  helperText={`* ${doI18n("pages:core-remote-resources:required_for_results", i18nRef.current)}`}
+                />
+                <Button
+                  onClick={() => {
+                    handleSetUsername();
+                    setShowTable(true);
+                  }}
+                  color="secondary"
+                  sx={{ height: "40px", minWidth: "fit-content" }}
+                >
+                  {doI18n(
+                    "pages:core-remote-resources:search",
+                    i18nRef.current,
+                  )}
+                </Button>
+              </Stack>
             </Box>
 
-            {userWhitelist && (
+            {userWhitelist && showTable && (
               <Box
                 sx={{
                   height: `calc(100vh - ${filterHeight + 208}px)`,
@@ -352,6 +388,7 @@ function App() {
                   downloadLegacyFunction={DowloadLegacy}
                   sources={userWhitelist}
                   showColumnFilters={defaultFilterProps}
+                  showFilterButtons={false}
                   sx={{ flex: 1 }}
                 />
               </Box>
@@ -359,6 +396,14 @@ function App() {
           </>
         )}
       </DialogContent>
+      <PanDialogActions
+        actionFn={closeDialog}
+        actionLabel={doI18n(
+          "pages:core-remote-resources:close",
+          i18nRef.current,
+        )}
+        actionVariant="contained"
+      />
     </PanDialog>
   );
 }
