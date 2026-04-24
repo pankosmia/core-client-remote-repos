@@ -11,6 +11,8 @@ import {
   Box,
   Chip,
   Stack,
+  Autocomplete,
+  CircularProgress,
 } from "@mui/material";
 import {
   PanDownload,
@@ -81,6 +83,9 @@ function App() {
   const filterRef = useRef(null);
   const [filterHeight, setFilterHeight] = useState(0);
   const [showTable, setShowTable] = useState(false);
+  const [options, setOptions] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false);
 
   useEffect(() => {
     if (!filterRef.current) return;
@@ -192,6 +197,35 @@ function App() {
       }
     }
   }, [clientInterfacesRef.current]);
+
+  useEffect(() => {
+    const search = async () => {
+      if (inputValue.length <= 2) {
+        setOptions([]);
+        setIsSearching(false);
+        return;
+      }
+      setIsSearching(true);
+      try {
+        const endpoint = selectedChips === 1 ? "org" : "users/search";
+        const res = await fetch(
+          `https://git.door43.org/api/v1/${endpoint}?q=${inputValue}`,
+        );
+        const data = await res.json();
+
+        setOptions(selectedChips === 1 ? data : data.data || []);
+      } catch (err) {
+        console.error(err);
+        setOptions([]);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const timer = setTimeout(search, 500);
+    return () => clearTimeout(timer);
+  }, [inputValue, selectedChips]);
+
   return (
     <PanDialog
       titleLabel={doI18n(
@@ -333,46 +367,118 @@ function App() {
                 alignItems="flex-start"
                 sx={{ mt: 2 }}
               >
-                <TextField
-                  label={
-                    selectedChips === 0
-                      ? `${doI18n("pages:core-remote-resources:username", i18nRef.current)} *`
-                      : selectedChips === 1
-                        ? `${doI18n("pages:core-remote-resources:organization", i18nRef.current)} *`
-                        : `${doI18n("pages:core-remote-resources:my_account", i18nRef.current)} *`
-                  }
-                  color="secondary"
+                <Autocomplete
                   size="small"
-                  variant="outlined"
-                  value={inputValue}
-                  sx={{ marginTop: 2 }}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      handleSetUsername();
-                      setShowTable(true);
+                  color="secondary"
+                  options={options}
+                  loading={isSearching}
+                  getOptionLabel={(option) => option.username || ""}
+                  inputValue={inputValue}
+                  onInputChange={(e, newInputValue, reason) => {
+                    if (reason === "input") {
+                      setInputValue(newInputValue);
+                    }
+                    if (newInputValue.length > 2) {
+                      setIsAutocompleteOpen(true);
+                    } else {
+                      setIsAutocompleteOpen(false);
                     }
                   }}
-                  helperText={`* ${doI18n("pages:core-remote-resources:required_for_results", i18nRef.current)}`}
-                />
-                <Button
-                  onClick={() => {
-                    handleSetUsername();
-                    setShowTable(true);
+                  freeSolo
+                  open={isAutocompleteOpen}
+                  onOpen={() => {
+                    if (inputValue.length > 2) setIsAutocompleteOpen(true);
                   }}
-                  color="secondary"
-                  sx={{ height: "40px", minWidth: "fit-content" }}
-                >
-                  {doI18n(
-                    "pages:core-remote-resources:search",
-                    i18nRef.current,
+                  onClose={(event, reason) => {
+                    if (reason === "toggleInput") return;
+                    setIsAutocompleteOpen(false);
+                  }}
+                  onChange={(event, selection) => {
+                    if (!selection) return;
+
+                    const exactName =
+                      typeof selection === "string"
+                        ? selection
+                        : selection.username;
+                    setInputValue(exactName);
+                    handleSetUsername(exactName);
+                    setShowTable(true);
+                    setIsAutocompleteOpen(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.defaultMuiPrevented = true;
+                      e.stopPropagation();
+                      e.preventDefault();
+
+                      const valueFromDom = e.target.value;
+
+                      if (!valueFromDom || valueFromDom.length <= 2) return;
+
+                      const validOption = options.find((opt) => {
+                        const name =
+                          typeof opt === "string" ? opt : opt.username;
+                        return (
+                          name?.toLowerCase() === valueFromDom?.toLowerCase()
+                        );
+                      });
+
+                      if (validOption) {
+                        const finalName =
+                          typeof validOption === "string"
+                            ? validOption
+                            : validOption.username;
+
+                        setIsAutocompleteOpen(false);
+                        setInputValue(finalName);
+                        handleSetUsername(finalName);
+                        setShowTable(true);
+                      } else {
+                        console.error(
+                          doI18n(
+                            "pages:core-remote-resources:no_matches",
+                            i18nRef.current,
+                          ),
+                        );
+                        //This snackbar won't show up for some reason
+                        enqueueSnackbar(
+                          `${doI18n("pages:core-remote-resources:no_matches", i18nRef.current)}`,
+                          { variant: "error" },
+                        );
+                      }
+                    }
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      color="secondary"
+                      sx={{ marginTop: 2 }}
+                      label={
+                        selectedChips === 0
+                          ? `${doI18n("pages:core-remote-resources:username", i18nRef.current)} *`
+                          : selectedChips === 1
+                            ? `${doI18n("pages:core-remote-resources:organization", i18nRef.current)} *`
+                            : `${doI18n("pages:core-remote-resources:my_account", i18nRef.current)} *`
+                      }
+                      helperText={`* ${doI18n("pages:core-remote-resources:required_for_results", i18nRef.current)}`}
+                      slotProps={{
+                        input: {
+                          ...params.InputProps,
+                          endAdornment: (
+                            <>
+                              {isSearching ? (
+                                <CircularProgress color="inherit" size={20} />
+                              ) : null}
+                              {params.InputProps.endAdornment}
+                            </>
+                          ),
+                        },
+                      }}
+                    />
                   )}
-                </Button>
+                />
               </Stack>
             </Box>
-
             {userWhitelist && showTable && (
               <Box
                 sx={{
