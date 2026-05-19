@@ -84,7 +84,6 @@ function App() {
 
   const typePageQuery = new URLSearchParams(window.location.search);
   const returnType = typePageQuery.get("returnTypePage");
-  console.log("returntype", returnType);
 
   useEffect(() => {
     if (!filterRef.current) return;
