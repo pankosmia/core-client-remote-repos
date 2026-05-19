@@ -82,6 +82,9 @@ function App() {
   const [filterHeight, setFilterHeight] = useState(0);
   const [showTable, setShowTable] = useState(false);
 
+  const typePageQuery = new URLSearchParams(window.location.search);
+  const returnType = typePageQuery.get("returnTypePage");
+
   useEffect(() => {
     if (!filterRef.current) return;
     const observer = new ResizeObserver((entries) => {
@@ -107,7 +110,15 @@ function App() {
   }, [sourceWhitelist]);
 
   const closeDialog = () => {
-    window.location.href = "/clients/content";
+    if (returnType === "dashboard") {
+      setTimeout(() => {
+        window.location.href = "/clients/main";
+      });
+    } else {
+      setTimeout(() => {
+        window.location.href = "/clients/content";
+      });
+    }
   };
 
   const handleChange = (event, newValue) => {
