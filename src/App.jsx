@@ -119,7 +119,6 @@ function App() {
     setValue(newValue);
     setShowTable(false);
   };
-  console.log(inputValue);
   useEffect(() => {
     setUsername("");
     setInputValue("");
@@ -212,6 +211,7 @@ function App() {
           `https://git.door43.org/api/v1/${endpoint}?q=${inputValue}`,
         );
         const data = await res.json();
+        console.log(data);
 
         setOptions(selectedChips === 1 ? data : data.data || []);
       } catch (err) {
