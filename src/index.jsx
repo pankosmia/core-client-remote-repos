@@ -10,10 +10,13 @@ const router = createHashRouter([
   },
 ]);
 
+const typePageQuery = new URLSearchParams(window.location.search);
+const returnType = typePageQuery.get("returnTypePage");
+
 createRoot(document.getElementById("root")).render(
   <SpSpa
     requireNet={true}
-    titleKey="pages:content:title"
+    titleKey={returnType ? "pages:core-dashboard:title" : "pages:content:title"}
     currentId="core-remote-resources"
   >
     <RouterProvider router={router} />
