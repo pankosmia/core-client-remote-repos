@@ -82,6 +82,14 @@ function App() {
   const closeDialog = () => {
     window.location.href = "/clients/content";
   };
+  const sourceWhitelist = useMemo(() => {
+    return [["git.door43.org/uW", "uW"]];
+  });
+
+  const defaultFilterProps = useMemo(() => {
+    const firstOrg = sourceWhitelist[0][0]; // "git.door43.org/BurritoTruck"
+    return (row) => row.source.startsWith(firstOrg);
+  }, [sourceWhitelist]);
 
   useEffect(() => {
     if (selectedChips === 1) {
@@ -356,7 +364,7 @@ function App() {
                     downloadFunction={DowloadBurrito}
                     downloadLegacyFunction={DowloadLegacy}
                     sources={searchWhitelist}
-                    //showColumnFilters={defaultFilterProps}
+                    showColumnFilters={defaultFilterProps}
                     showFilterButtons={false}
                     sx={{ flex: 1 }}
                   />
