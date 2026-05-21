@@ -182,7 +182,6 @@ function App() {
     if (inputValue.trim() === "") {
       return;
     }
-
     setUsername(inputValue);
   };
 
@@ -236,6 +235,23 @@ function App() {
     const timer = setTimeout(search, 500);
     return () => clearTimeout(timer);
   }, [inputValue, selectedChips]);
+
+  useEffect(() => {
+    const validOption = options.find((opt) => {
+      const name = typeof opt === "string" ? opt : opt.username;
+      return name?.toLowerCase() === inputValue?.trim().toLowerCase();
+    });
+
+    if (validOption) {
+      const finalName =
+        typeof validOption === "string" ? validOption : validOption.username;
+      if (username !== finalName) {
+        handleSetUsername(finalName);
+      }
+    }
+  }, [inputValue, options]);
+
+  console.log(username, inputValue);
 
   return (
     <Box
@@ -402,6 +418,16 @@ function App() {
                     getOptionLabel={(option) => option.username || ""}
                     inputValue={inputValue}
                     onInputChange={(e, newInputValue, reason) => {
+                      if (reason === "clear" || !newInputValue) {
+                        setInputValue("");
+                        setShowTable(false);
+                        setIsAutocompleteOpen(false);
+                        handleSetUsername("");
+                        return;
+                      }
+                      if (reason === "reset") {
+                        return;
+                      }
                       if (reason === "input") {
                         setInputValue(newInputValue);
                       }
@@ -421,14 +447,18 @@ function App() {
                       setIsAutocompleteOpen(false);
                     }}
                     onChange={(event, selection) => {
-                      if (!selection) return;
+                      if (!selection) {
+                        setInputValue("");
+                        handleSetUsername("");
+                        setShowTable(false);
+                        return;
+                      }
 
                       const exactName =
                         typeof selection === "string"
                           ? selection
                           : selection.username;
                       setInputValue(exactName);
-                      handleSetUsername(exactName);
                       setShowTable(true);
                       setIsAutocompleteOpen(false);
                     }}
@@ -457,8 +487,8 @@ function App() {
                               : validOption.username;
 
                           setIsAutocompleteOpen(false);
-                          setInputValue(finalName);
                           handleSetUsername(finalName);
+                          setInputValue(finalName);
                           setShowTable(true);
                         } else {
                           console.error(
