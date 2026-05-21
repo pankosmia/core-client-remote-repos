@@ -9,6 +9,8 @@ import {
   Box,
   Chip,
   Stack,
+  Autocomplete,
+  CircularProgress,
 } from "@mui/material";
 import {
   PanDownload,
@@ -80,6 +82,20 @@ function App() {
   const [showTable, setShowTable] = useState(false);
   const typePageQuery = new URLSearchParams(window.location.search);
   const returnType = typePageQuery.get("returnTypePage");
+  const [options, setOptions] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false);
+
+  useEffect(() => {
+    if (!filterRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setFilterHeight(entry.contentRect.height);
+      }
+    });
+    observer.observe(filterRef.current);
+    return () => observer.disconnect();
+  }, [value]);
 
   const sourceWhitelist = useMemo(() => {
     return [["git.door43.org/uW", "uW"]];
@@ -102,6 +118,10 @@ function App() {
     }
   };
 
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+    setShowTable(false);
+  };
   useEffect(() => {
     if (selectedChips === 1) {
       const defaultOrg = "uW";
@@ -167,8 +187,7 @@ function App() {
     if (inputValue.trim() === "") {
       return;
     }
-
-    setSearchValue(inputValue.trim().toLowerCase());
+    setUsername(inputValue);
   };
 
   useEffect(() => {
@@ -194,31 +213,111 @@ function App() {
       }
     }
   }, [clientInterfacesRef.current]);
+
+  useEffect(() => {
+    const search = async () => {
+      if (inputValue.length <= 2) {
+        setOptions([]);
+        setIsSearching(false);
+        return;
+      }
+      setIsSearching(true);
+      try {
+        const endpoint = selectedChips === 1 ? "org" : "users/search";
+        const res = await fetch(
+          `https://git.door43.org/api/v1/${endpoint}?q=${inputValue}`,
+        );
+        const data = await res.json();
+        console.log(data);
+
+        setOptions(selectedChips === 1 ? data : data.data || []);
+      } catch (err) {
+        console.error(err);
+        setOptions([]);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const timer = setTimeout(search, 500);
+    return () => clearTimeout(timer);
+  }, [inputValue, selectedChips]);
+
+  useEffect(() => {
+    const validOption = options.find((opt) => {
+      const name = typeof opt === "string" ? opt : opt.username;
+      return name?.toLowerCase() === inputValue?.trim().toLowerCase();
+    });
+
+    if (validOption) {
+      const finalName =
+        typeof validOption === "string" ? validOption : validOption.username;
+      if (username !== finalName) {
+        handleSetUsername(finalName);
+      }
+    }
+  }, [inputValue, options]);
+
+  console.log(username, inputValue);
+
   return (
-    <Box>
-      <Box
-        sx={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          zIndex: -1,
-          backgroundImage:
-            'url("/app-resources/pages/content/background_blur.png")',
-          backgroundRepeat: "no-repeat",
-        }}
+    <Box
+      sx={{
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        zIndex: -1,
+        backgroundImage:
+          'url("/app-resources/pages/content/background_blur.png")',
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <PanDialog
+        titleLabel={doI18n(
+          "pages:core-remote-resources:download_from_internet",
+          i18nRef.current,
+        )}
+        isOpen={true}
+        closeFn={closeDialog}
+        size="lg"
       >
-        <PanDialog
-          titleLabel={doI18n(
-            "pages:core-remote-resources:download_from_internet",
-            i18nRef.current,
-          )}
-          isOpen={true}
-          closeFn={closeDialog}
-          size="lg"
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          textColor="secondary"
+          indicatorColor="secondary"
+          sx={{ mt: 2, mx: 2 }}
         >
-          <DialogContent sx={{ overflow: "hidden" }}>
+          <Tab
+            label={`${doI18n(
+              "pages:core-remote-resources:curated_content",
+              i18nRef.current,
+            )}`}
+          />
+          {urlLegacyContent && (
+            <Tab
+              label={`${doI18n(
+                "pages:core-remote-resources:browse_door43",
+                i18nRef.current,
+              )}`}
+            />
+          )}
+        </Tabs>
+        <DialogContent sx={{ overflow: "hidden" }}>
+          {value === 0 && (
+            <Box sx={{ height: "calc(100vh - 208px)", overflow: "hidden" }}>
+              <PanDownload
+                downloadedType="org"
+                downloadFunction={DowloadBurrito}
+                sources={sourceWhitelist}
+                showColumnFilters={defaultFilterProps}
+                sx={{ flex: 1 }}
+              />
+            </Box>
+          )}
+          {value === 1 && (
             <>
               <Box sx={{ overflow: "hidden" }} ref={filterRef}>
                 <Box>
@@ -318,48 +417,133 @@ function App() {
                   alignItems="flex-start"
                   sx={{ mt: 2 }}
                 >
-                  <TextField
-                    InputLabelProps={{ shrink: true }}
-                    label={
-                      selectedChips === 0
-                        ? `${doI18n("pages:core-remote-resources:username", i18nRef.current)} *`
-                        : selectedChips === 1
-                          ? `${doI18n("pages:core-remote-resources:organization", i18nRef.current)} *`
-                          : `${doI18n("pages:core-remote-resources:my_account", i18nRef.current)} *`
-                    }
-                    color="secondary"
+                  <Autocomplete
                     size="small"
-                    variant="outlined"
-                    value={inputValue}
-                    sx={{ marginTop: 2 }}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        handleSetUsername();
-                        setShowTable(true);
+                    color="secondary"
+                    options={options}
+                    loading={isSearching}
+                    getOptionLabel={(option) => option.username || ""}
+                    inputValue={inputValue}
+                    onInputChange={(e, newInputValue, reason) => {
+                      if (reason === "clear" || !newInputValue) {
+                        setInputValue("");
+                        setShowTable(false);
+                        setIsAutocompleteOpen(false);
+                        handleSetUsername("");
+                        return;
+                      }
+                      if (reason === "reset") {
+                        return;
+                      }
+                      if (reason === "input") {
+                        setInputValue(newInputValue);
+                      }
+                      if (newInputValue.length > 2) {
+                        setIsAutocompleteOpen(true);
+                      } else {
+                        setIsAutocompleteOpen(false);
                       }
                     }}
-                    helperText={`* ${doI18n("pages:core-remote-resources:required_for_results", i18nRef.current)}`}
-                  />
-                  <Button
-                    onClick={() => {
-                      handleSetUsername();
-                      setShowTable(true);
+                    freeSolo
+                    open={isAutocompleteOpen}
+                    onOpen={() => {
+                      if (inputValue.length > 2) setIsAutocompleteOpen(true);
                     }}
-                    color="secondary"
-                    sx={{ height: "40px", minWidth: "fit-content" }}
-                  >
-                    {doI18n(
-                      "pages:core-remote-resources:search",
-                      i18nRef.current,
+                    onClose={(event, reason) => {
+                      if (reason === "toggleInput") return;
+                      setIsAutocompleteOpen(false);
+                    }}
+                    onChange={(event, selection) => {
+                      if (!selection) {
+                        setInputValue("");
+                        handleSetUsername("");
+                        setShowTable(false);
+                        return;
+                      }
+
+                      const exactName =
+                        typeof selection === "string"
+                          ? selection
+                          : selection.username;
+                      setInputValue(exactName);
+                      setShowTable(true);
+                      setIsAutocompleteOpen(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.defaultMuiPrevented = true;
+                        e.stopPropagation();
+                        e.preventDefault();
+
+                        const valueFromDom = e.target.value;
+
+                        if (!valueFromDom || valueFromDom.length <= 2) return;
+
+                        const validOption = options.find((opt) => {
+                          const name =
+                            typeof opt === "string" ? opt : opt.username;
+                          return (
+                            name?.toLowerCase() === valueFromDom?.toLowerCase()
+                          );
+                        });
+
+                        if (validOption) {
+                          const finalName =
+                            typeof validOption === "string"
+                              ? validOption
+                              : validOption.username;
+
+                          setIsAutocompleteOpen(false);
+                          handleSetUsername(finalName);
+                          setInputValue(finalName);
+                          setShowTable(true);
+                        } else {
+                          console.error(
+                            doI18n(
+                              "pages:core-remote-resources:no_matches",
+                              i18nRef.current,
+                            ),
+                          );
+                          //This snackbar won't show up for some reason
+                          enqueueSnackbar(
+                            `${doI18n("pages:core-remote-resources:no_matches", i18nRef.current)}`,
+                            { variant: "error" },
+                          );
+                        }
+                      }
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        color="secondary"
+                        sx={{ marginTop: 2 }}
+                        label={
+                          selectedChips === 0
+                            ? `${doI18n("pages:core-remote-resources:username", i18nRef.current)} *`
+                            : selectedChips === 1
+                              ? `${doI18n("pages:core-remote-resources:organization", i18nRef.current)} *`
+                              : `${doI18n("pages:core-remote-resources:my_account", i18nRef.current)} *`
+                        }
+                        helperText={`* ${doI18n("pages:core-remote-resources:required_for_results", i18nRef.current)}`}
+                        slotProps={{
+                          input: {
+                            ...params.InputProps,
+                            endAdornment: (
+                              <>
+                                {isSearching ? (
+                                  <CircularProgress color="inherit" size={20} />
+                                ) : null}
+                                {params.InputProps.endAdornment}
+                              </>
+                            ),
+                          },
+                        }}
+                      />
                     )}
-                  </Button>
+                  />
                 </Stack>
               </Box>
-
-              {searchWhitelist && showTable && (
+              {userWhitelist && showTable && (
                 <Box
                   sx={{
                     height: `calc(100vh - ${filterHeight + 208}px)`,
@@ -374,7 +558,7 @@ function App() {
                     }
                     downloadFunction={DowloadBurrito}
                     downloadLegacyFunction={DowloadLegacy}
-                    sources={searchWhitelist}
+                    sources={userWhitelist}
                     showColumnFilters={defaultFilterProps}
                     showFilterButtons={false}
                     sx={{ flex: 1 }}
@@ -382,17 +566,17 @@ function App() {
                 </Box>
               )}
             </>
-          </DialogContent>
-          <PanDialogActions
-            actionFn={closeDialog}
-            actionLabel={doI18n(
-              "pages:core-remote-resources:close",
-              i18nRef.current,
-            )}
-            actionVariant="contained"
-          />
-        </PanDialog>
-      </Box>
+          )}
+        </DialogContent>
+        <PanDialogActions
+          actionFn={closeDialog}
+          actionLabel={doI18n(
+            "pages:core-remote-resources:close",
+            i18nRef.current,
+          )}
+          actionVariant="contained"
+        />
+      </PanDialog>
     </Box>
   );
 }

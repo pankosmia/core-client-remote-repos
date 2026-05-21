@@ -138,9 +138,9 @@
       "en": "Required to display results",
       "es": "Es necesario para mostrar los resultados"
     },
-    "search": {
-      "en": "Search",
-      "es": "Buscar"
+    "no_matches": {
+      "en": "No matches found",
+      "es": "No se encontraron coincidencias."
     }
   }
 }
