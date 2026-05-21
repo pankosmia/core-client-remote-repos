@@ -4,8 +4,6 @@ import { useMemo, useState } from "react";
 import { doI18n, postEmptyJson } from "pithekos-lib";
 import {
   DialogContent,
-  Tabs,
-  Tab,
   TextField,
   Button,
   Box,
@@ -65,59 +63,42 @@ function walk(node, rootKey, parentKey, targetKey, typeContent) {
 }
 
 // Usage
-
+console.log();
 function App() {
   const { debugRef } = useContext(debugContext);
   const { i18nRef } = useContext(i18nContext);
   const { clientInterfacesRef } = useContext(clientInterfacesContext);
 
   /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
-  const [value, setValue] = useState(0);
-  const [username, setUsername] = useState(null);
-  const [inputValue, setInputValue] = useState("");
-  const [userWhitelist, setUserWhitelist] = useState(null);
-  const [selectedChips, setSelectedChips] = useState(0);
+  const [searchValue, setSearchValue] = useState(null);
+  const [inputValue, setInputValue] = useState(null);
+  const [searchWhitelist, setSearchWhitelist] = useState(null);
+  const [selectedChips, setSelectedChips] = useState(1);
   const [urlLegacyContent, setUrlLegacyContent] = useState("");
   const filterRef = useRef(null);
   const [filterHeight, setFilterHeight] = useState(0);
   const [showTable, setShowTable] = useState(false);
 
-  useEffect(() => {
-    if (!filterRef.current) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setFilterHeight(entry.contentRect.height);
-      }
-    });
-    observer.observe(filterRef.current);
-    return () => observer.disconnect();
-  }, [value]);
-
-  const sourceWhitelist = useMemo(() => {
-    return [
-      ["git.door43.org/BurritoTruck", "Xenizo "],
-      ["git.door43.org/uW", "UnfoldingWord"],
-      ["git.door43.org/shower", "Aquifer"],
-    ];
-  });
-
-  const defaultFilterProps = useMemo(() => {
-    const firstOrg = sourceWhitelist[0][0]; // "git.door43.org/BurritoTruck"
-    return (row) => row.source.startsWith(firstOrg);
-  }, [sourceWhitelist]);
-
   const closeDialog = () => {
     window.location.href = "/clients/content";
   };
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-    setShowTable(false);
-  };
-  console.log(inputValue);
   useEffect(() => {
-    setUsername("");
-    setInputValue("");
+    if (selectedChips === 1) {
+      const defaultOrg = "uW";
+
+      setInputValue("uW");
+      setSearchValue(defaultOrg);
+
+      setSearchWhitelist([[`git.door43.org/${defaultOrg}`, `uW content`]]);
+
+      setShowTable(true);
+    } else {
+      setInputValue("");
+      setSearchValue("");
+      setSearchWhitelist(null);
+      setShowTable(false);
+    }
   }, [selectedChips]);
 
   async function DowloadLegacy(params, remoteRepoPath, postType) {
@@ -168,14 +149,16 @@ function App() {
       return;
     }
 
-    setUsername(inputValue);
+    setSearchValue(inputValue.trim().toLowerCase());
   };
 
   useEffect(() => {
-    if (username) {
-      setUserWhitelist([[`git.door43.org/${username}`, `${username} content`]]);
+    if (searchValue) {
+      setSearchWhitelist([
+        [`git.door43.org/${searchValue}`, `${searchValue} content`],
+      ]);
     }
-  }, [username]);
+  }, [searchValue]);
 
   useEffect(() => {
     if (clientInterfacesRef.current) {
@@ -216,204 +199,170 @@ function App() {
           closeFn={closeDialog}
           size="lg"
         >
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            textColor="secondary"
-            indicatorColor="secondary"
-            sx={{ mt: 2, mx: 2 }}
-          >
-            <Tab
-              label={`${doI18n(
-                "pages:core-remote-resources:curated_content",
-                i18nRef.current,
-              )}`}
-            />
-            {urlLegacyContent && (
-              <Tab
-                label={`${doI18n(
-                  "pages:core-remote-resources:browse_door43",
-                  i18nRef.current,
-                )}`}
-              />
-            )}
-          </Tabs>
           <DialogContent sx={{ overflow: "hidden" }}>
-            {value === 0 && (
-              <Box sx={{ height: "calc(100vh - 208px)", overflow: "hidden" }}>
-                <PanDownload
-                  downloadedType="org"
-                  downloadFunction={DowloadBurrito}
-                  sources={sourceWhitelist}
-                  showColumnFilters={defaultFilterProps}
-                  sx={{ flex: 1 }}
-                />
-              </Box>
-            )}
-            {value === 1 && (
-              <>
-                <Box sx={{ overflow: "hidden" }} ref={filterRef}>
-                  <Box>
-                    <Chip
-                      variant={selectedChips === 0 ? "filled" : "outlined"}
-                      onClick={() => {
-                        if (selectedChips !== 0) {
-                          setShowTable(false);
-                          setSelectedChips(0);
-                        }
-                      }}
-                      color="secondary"
-                      icon={selectedChips === 0 ? <Check /> : <PermIdentity />}
-                      sx={
-                        selectedChips === 1
-                          ? {
-                              borderTopRightRadius: 0,
-                              borderBottomRightRadius: 0,
-                              borderRightWidth: 0,
-                            }
-                          : {
-                              borderTopRightRadius: 0,
-                              borderBottomRightRadius: 0,
-                            }
+            <>
+              <Box sx={{ overflow: "hidden" }} ref={filterRef}>
+                <Box>
+                  <Chip
+                    variant={selectedChips === 0 ? "filled" : "outlined"}
+                    onClick={() => {
+                      if (selectedChips !== 0) {
+                        setShowTable(false);
+                        setSelectedChips(0);
                       }
-                      label={doI18n(
-                        "pages:core-remote-resources:username",
-                        i18nRef.current,
-                      )}
-                    />
-                    <Chip
-                      variant={selectedChips === 1 ? "filled" : "outlined"}
-                      onClick={() => {
-                        if (selectedChips !== 1) {
-                          setShowTable(false);
-                          setSelectedChips(1);
-                        }
-                      }}
-                      icon={selectedChips === 1 ? <Check /> : <CorporateFare />}
-                      color="secondary"
-                      sx={
-                        selectedChips === 0
-                          ? {
-                              borderTopLeftRadius: 0,
-                              borderBottomLeftRadius: 0,
-                              padding: -1,
-                              borderTopRightRadius: 0,
-                              borderBottomRightRadius: 0,
-                              borderRightWidth: 0,
-                              borderLeftWidth: 0,
-                            }
-                          : {
-                              borderTopLeftRadius: 0,
-                              borderBottomLeftRadius: 0,
-                              borderTopRightRadius: 0,
-                              borderBottomRightRadius: 0,
-                              borderRightWidth: 0,
-                              borderLeftWidth: 0,
+                    }}
+                    color="secondary"
+                    icon={selectedChips === 0 ? <Check /> : <PermIdentity />}
+                    sx={
+                      selectedChips === 1
+                        ? {
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRightWidth: 0,
+                          }
+                        : {
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                          }
+                    }
+                    label={doI18n(
+                      "pages:core-remote-resources:username",
+                      i18nRef.current,
+                    )}
+                  />
+                  <Chip
+                    variant={selectedChips === 1 ? "filled" : "outlined"}
+                    onClick={() => {
+                      if (selectedChips !== 1) {
+                        setShowTable(false);
+                        setSelectedChips(1);
+                      }
+                    }}
+                    icon={selectedChips === 1 ? <Check /> : <CorporateFare />}
+                    color="secondary"
+                    sx={
+                      selectedChips === 0
+                        ? {
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            padding: -1,
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRightWidth: 0,
+                            borderLeftWidth: 0,
+                          }
+                        : {
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRightWidth: 0,
+                            borderLeftWidth: 0,
 
-                              padding: -1,
-                            }
-                      }
-                      label={doI18n(
-                        "pages:core-remote-resources:organization",
-                        i18nRef.current,
-                      )}
-                    />
-                    <Chip
-                      variant={selectedChips === 2 ? "filled" : "outlined"}
-                      disabled={true}
-                      onClick={() => {
-                        setSelectedChips(2);
-                      }}
-                      icon={selectedChips === 2 ? <Check /> : <Login />}
-                      color="secondary"
-                      sx={
-                        selectedChips === 1
-                          ? {
-                              borderTopLeftRadius: 0,
-                              borderBottomLeftRadius: 0,
-                              borderLeftWidth: 0,
-                            }
-                          : {
-                              borderTopLeftRadius: 0,
-                              borderBottomLeftRadius: 0,
-                            }
-                      }
-                      label={doI18n(
-                        "pages:core-remote-resources:my_account",
-                        i18nRef.current,
-                      )}
-                    />
-                  </Box>
-                  <Stack
-                    direction="row"
-                    spacing={0.5}
-                    alignItems="flex-start"
-                    sx={{ mt: 2 }}
-                  >
-                    <TextField
-                      label={
-                        selectedChips === 0
-                          ? `${doI18n("pages:core-remote-resources:username", i18nRef.current)} *`
-                          : selectedChips === 1
-                            ? `${doI18n("pages:core-remote-resources:organization", i18nRef.current)} *`
-                            : `${doI18n("pages:core-remote-resources:my_account", i18nRef.current)} *`
-                      }
-                      color="secondary"
-                      size="small"
-                      variant="outlined"
-                      value={inputValue}
-                      sx={{ marginTop: 2 }}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          handleSetUsername();
-                          setShowTable(true);
-                        }
-                      }}
-                      helperText={`* ${doI18n("pages:core-remote-resources:required_for_results", i18nRef.current)}`}
-                    />
-                    <Button
-                      onClick={() => {
+                            padding: -1,
+                          }
+                    }
+                    label={doI18n(
+                      "pages:core-remote-resources:organization",
+                      i18nRef.current,
+                    )}
+                  />
+                  <Chip
+                    variant={selectedChips === 2 ? "filled" : "outlined"}
+                    disabled={true}
+                    onClick={() => {
+                      setSelectedChips(2);
+                    }}
+                    icon={selectedChips === 2 ? <Check /> : <Login />}
+                    color="secondary"
+                    sx={
+                      selectedChips === 1
+                        ? {
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeftWidth: 0,
+                          }
+                        : {
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                          }
+                    }
+                    label={doI18n(
+                      "pages:core-remote-resources:my_account",
+                      i18nRef.current,
+                    )}
+                  />
+                </Box>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  alignItems="flex-start"
+                  sx={{ mt: 2 }}
+                >
+                  <TextField
+                    InputLabelProps={{ shrink: true }}
+                    label={
+                      selectedChips === 0
+                        ? `${doI18n("pages:core-remote-resources:username", i18nRef.current)} *`
+                        : selectedChips === 1
+                          ? `${doI18n("pages:core-remote-resources:organization", i18nRef.current)} *`
+                          : `${doI18n("pages:core-remote-resources:my_account", i18nRef.current)} *`
+                    }
+                    color="secondary"
+                    size="small"
+                    variant="outlined"
+                    value={inputValue}
+                    sx={{ marginTop: 2 }}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.stopPropagation();
+                        e.preventDefault();
                         handleSetUsername();
                         setShowTable(true);
-                      }}
-                      color="secondary"
-                      sx={{ height: "40px", minWidth: "fit-content" }}
-                    >
-                      {doI18n(
-                        "pages:core-remote-resources:search",
-                        i18nRef.current,
-                      )}
-                    </Button>
-                  </Stack>
-                </Box>
-
-                {userWhitelist && showTable && (
-                  <Box
-                    sx={{
-                      height: `calc(100vh - ${filterHeight + 208}px)`,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <PanDownload
-                      downloadedType={
-                        selectedChips === 0 || selectedChips === 2
-                          ? "user"
-                          : "org"
                       }
-                      downloadFunction={DowloadBurrito}
-                      downloadLegacyFunction={DowloadLegacy}
-                      sources={userWhitelist}
-                      showColumnFilters={defaultFilterProps}
-                      showFilterButtons={false}
-                      sx={{ flex: 1 }}
-                    />
-                  </Box>
-                )}
-              </>
-            )}
+                    }}
+                    helperText={`* ${doI18n("pages:core-remote-resources:required_for_results", i18nRef.current)}`}
+                  />
+                  <Button
+                    onClick={() => {
+                      handleSetUsername();
+                      setShowTable(true);
+                    }}
+                    color="secondary"
+                    sx={{ height: "40px", minWidth: "fit-content" }}
+                  >
+                    {doI18n(
+                      "pages:core-remote-resources:search",
+                      i18nRef.current,
+                    )}
+                  </Button>
+                </Stack>
+              </Box>
+
+              {searchWhitelist && showTable && (
+                <Box
+                  sx={{
+                    height: `calc(100vh - ${filterHeight + 208}px)`,
+                    overflow: "hidden",
+                  }}
+                >
+                  <PanDownload
+                    downloadedType={
+                      selectedChips === 0 || selectedChips === 2
+                        ? "user"
+                        : "org"
+                    }
+                    downloadFunction={DowloadBurrito}
+                    downloadLegacyFunction={DowloadLegacy}
+                    sources={searchWhitelist}
+                    //showColumnFilters={defaultFilterProps}
+                    showFilterButtons={false}
+                    sx={{ flex: 1 }}
+                  />
+                </Box>
+              )}
+            </>
           </DialogContent>
           <PanDialogActions
             actionFn={closeDialog}
