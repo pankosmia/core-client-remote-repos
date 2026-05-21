@@ -4,8 +4,6 @@ import { useMemo, useState } from "react";
 import { doI18n, postEmptyJson } from "pithekos-lib";
 import {
   DialogContent,
-  Tabs,
-  Tab,
   TextField,
   Button,
   Box,
@@ -67,23 +65,21 @@ function walk(node, rootKey, parentKey, targetKey, typeContent) {
 }
 
 // Usage
-
+console.log();
 function App() {
   const { debugRef } = useContext(debugContext);
   const { i18nRef } = useContext(i18nContext);
   const { clientInterfacesRef } = useContext(clientInterfacesContext);
 
   /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
-  const [value, setValue] = useState(0);
-  const [username, setUsername] = useState(null);
-  const [inputValue, setInputValue] = useState("");
-  const [userWhitelist, setUserWhitelist] = useState(null);
-  const [selectedChips, setSelectedChips] = useState(0);
+  const [searchValue, setSearchValue] = useState(null);
+  const [inputValue, setInputValue] = useState(null);
+  const [searchWhitelist, setSearchWhitelist] = useState(null);
+  const [selectedChips, setSelectedChips] = useState(1);
   const [urlLegacyContent, setUrlLegacyContent] = useState("");
   const filterRef = useRef(null);
   const [filterHeight, setFilterHeight] = useState(0);
   const [showTable, setShowTable] = useState(false);
-
   const typePageQuery = new URLSearchParams(window.location.search);
   const returnType = typePageQuery.get("returnTypePage");
   const [options, setOptions] = useState([]);
@@ -102,11 +98,7 @@ function App() {
   }, [value]);
 
   const sourceWhitelist = useMemo(() => {
-    return [
-      ["git.door43.org/BurritoTruck", "Xenizo "],
-      ["git.door43.org/uW", "UnfoldingWord"],
-      ["git.door43.org/shower", "Aquifer"],
-    ];
+    return [["git.door43.org/uW", "uW"]];
   });
 
   const defaultFilterProps = useMemo(() => {
@@ -131,8 +123,21 @@ function App() {
     setShowTable(false);
   };
   useEffect(() => {
-    setUsername("");
-    setInputValue("");
+    if (selectedChips === 1) {
+      const defaultOrg = "uW";
+
+      setInputValue("uW");
+      setSearchValue(defaultOrg);
+
+      setSearchWhitelist([[`git.door43.org/${defaultOrg}`, `uW content`]]);
+
+      setShowTable(true);
+    } else {
+      setInputValue("");
+      setSearchValue("");
+      setSearchWhitelist(null);
+      setShowTable(false);
+    }
   }, [selectedChips]);
 
   async function DowloadLegacy(params, remoteRepoPath, postType) {
@@ -186,10 +191,12 @@ function App() {
   };
 
   useEffect(() => {
-    if (username) {
-      setUserWhitelist([[`git.door43.org/${username}`, `${username} content`]]);
+    if (searchValue) {
+      setSearchWhitelist([
+        [`git.door43.org/${searchValue}`, `${searchValue} content`],
+      ]);
     }
-  }, [username]);
+  }, [searchValue]);
 
   useEffect(() => {
     if (clientInterfacesRef.current) {
