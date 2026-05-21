@@ -78,10 +78,9 @@ function App() {
   const filterRef = useRef(null);
   const [filterHeight, setFilterHeight] = useState(0);
   const [showTable, setShowTable] = useState(false);
+  const typePageQuery = new URLSearchParams(window.location.search);
+  const returnType = typePageQuery.get("returnTypePage");
 
-  const closeDialog = () => {
-    window.location.href = "/clients/content";
-  };
   const sourceWhitelist = useMemo(() => {
     return [["git.door43.org/uW", "uW"]];
   });
@@ -90,6 +89,18 @@ function App() {
     const firstOrg = sourceWhitelist[0][0]; // "git.door43.org/BurritoTruck"
     return (row) => row.source.startsWith(firstOrg);
   }, [sourceWhitelist]);
+
+  const closeDialog = () => {
+    if (returnType === "dashboard") {
+      setTimeout(() => {
+        window.location.href = "/clients/main";
+      });
+    } else {
+      setTimeout(() => {
+        window.location.href = "/clients/content";
+      });
+    }
+  };
 
   useEffect(() => {
     if (selectedChips === 1) {
