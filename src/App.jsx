@@ -1,14 +1,16 @@
 import { useContext, useEffect, useRef } from "react";
 
 import { useMemo, useState } from "react";
-import { doI18n, postEmptyJson } from "pithekos-lib";
+import { doI18n, getJson, postEmptyJson } from "pithekos-lib";
 import {
   DialogContent,
   TextField,
-  Button,
   Box,
   Chip,
   Stack,
+  InputAdornment,
+  IconButton,
+  MenuItem,
 } from "@mui/material";
 import {
   PanDownload,
@@ -20,7 +22,7 @@ import {
 } from "pankosmia-rcl";
 import { enqueueSnackbar } from "notistack";
 import { Check, CorporateFare, Login, PermIdentity } from "@mui/icons-material";
-
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 function findEndpoint(config, targetKey, typeContent) {
   for (const topLevelKey of Object.keys(config)) {
     const result = walk(
@@ -63,7 +65,7 @@ function walk(node, rootKey, parentKey, targetKey, typeContent) {
 }
 
 // Usage
-console.log();
+
 function App() {
   const { debugRef } = useContext(debugContext);
   const { i18nRef } = useContext(i18nContext);
@@ -80,6 +82,8 @@ function App() {
   const [showTable, setShowTable] = useState(false);
   const typePageQuery = new URLSearchParams(window.location.search);
   const returnType = typePageQuery.get("returnTypePage");
+  const [nameOrganisation, setNameOrganisation] = useState([]);
+  console.log("nameOrganisation", nameOrganisation);
 
   const sourceWhitelist = useMemo(() => {
     return [["git.door43.org/uW", "uW"]];
@@ -101,24 +105,16 @@ function App() {
       });
     }
   };
-
   useEffect(() => {
-    if (selectedChips === 1) {
-      const defaultOrg = "uW";
-
-      setInputValue("uW");
-      setSearchValue(defaultOrg);
-
-      setSearchWhitelist([[`git.door43.org/${defaultOrg}`, `uW content`]]);
-
-      setShowTable(true);
-    } else {
-      setInputValue("");
-      setSearchValue("");
-      setSearchWhitelist(null);
-      setShowTable(false);
-    }
-  }, [selectedChips]);
+    getJson(
+      "/content-utils/product?resource_path=core-client-remote-repos/organizations/organization.json",
+    )
+      .then((res) => res.json)
+      .then((data) => {
+        setNameOrganisation(data.organizations);
+      })
+      .catch((err) => console.error("Error :", err));
+  }, []);
 
   async function DowloadLegacy(params, remoteRepoPath, postType) {
     let fetchResponse;
@@ -319,7 +315,30 @@ function App() {
                   sx={{ mt: 2 }}
                 >
                   <TextField
-                    InputLabelProps={{ shrink: true }}
+                    select
+                    slotProps={{
+                      select: {
+                        IconComponent: () => null,
+                      },
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => {
+                                handleSetUsername();
+                                setShowTable(true);
+                              }}
+                              //onMouseDown={handleMouseDownPassword}
+                              //onMouseUp={handleMouseUpPassword}
+                              edge="end"
+                            >
+                              <SearchOutlinedIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                      inputLabel: { shrink: true },
+                    }}
                     label={
                       selectedChips === 0
                         ? `${doI18n("pages:core-remote-resources:username", i18nRef.current)} *`
@@ -341,21 +360,17 @@ function App() {
                         setShowTable(true);
                       }
                     }}
-                    helperText={`* ${doI18n("pages:core-remote-resources:required_for_results", i18nRef.current)}`}
-                  />
-                  <Button
-                    onClick={() => {
-                      handleSetUsername();
-                      setShowTable(true);
-                    }}
-                    color="secondary"
-                    sx={{ height: "40px", minWidth: "fit-content" }}
-                  >
-                    {doI18n(
-                      "pages:core-remote-resources:search",
+                    helperText={doI18n(
+                      "pages:core-remote-resources:required_for_results",
                       i18nRef.current,
                     )}
-                  </Button>
+                  >
+                    {nameOrganisation.map((option) => (
+                      <MenuItem key={option.url} value={option.name}>
+                        {option.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                 </Stack>
               </Box>
 
