@@ -7,10 +7,10 @@ import {
   TextField,
   Box,
   Chip,
-  Stack,
-  InputAdornment,
   IconButton,
-  MenuItem,
+  Autocomplete,
+  Grid2,
+  Typography,
 } from "@mui/material";
 import {
   PanDownload,
@@ -21,7 +21,7 @@ import {
   clientInterfacesContext,
 } from "pankosmia-rcl";
 import { enqueueSnackbar } from "notistack";
-import { Check, CorporateFare, Login, PermIdentity } from "@mui/icons-material";
+import { Check, CorporateFare, Login } from "@mui/icons-material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 function findEndpoint(config, targetKey, typeContent) {
   for (const topLevelKey of Object.keys(config)) {
@@ -75,7 +75,7 @@ function App() {
   const [searchValue, setSearchValue] = useState(null);
   const [inputValue, setInputValue] = useState(null);
   const [searchWhitelist, setSearchWhitelist] = useState(null);
-  const [selectedChips, setSelectedChips] = useState(1);
+  const [selectedChips, setSelectedChips] = useState(0);
   const [urlLegacyContent, setUrlLegacyContent] = useState("");
   const filterRef = useRef(null);
   const [filterHeight, setFilterHeight] = useState(0);
@@ -83,7 +83,6 @@ function App() {
   const typePageQuery = new URLSearchParams(window.location.search);
   const returnType = typePageQuery.get("returnTypePage");
   const [nameOrganisation, setNameOrganisation] = useState([]);
-  console.log("nameOrganisation", nameOrganisation);
 
   const sourceWhitelist = useMemo(() => {
     return [["git.door43.org/uW", "uW"]];
@@ -167,14 +166,16 @@ function App() {
     setSearchValue(inputValue.trim().toLowerCase());
   };
 
-  useEffect(() => {
-    if (searchValue) {
-      setSearchWhitelist([
-        [`git.door43.org/${searchValue}`, `${searchValue} content`],
-      ]);
+  const handleChange = (value) => {
+    setInputValue(value);
+    console.log(inputValue);
+    const selectedOrg = nameOrganisation?.find((o) => o.name === value);
+    if (selectedOrg) {
+      setSearchWhitelist([[selectedOrg.url, `${selectedOrg.name} content`]]);
+    } else {
+      setSearchWhitelist([[`git.door43.org/${value}`, `${value} content`]]);
     }
-  }, [searchValue]);
-
+  };
   useEffect(() => {
     if (clientInterfacesRef.current) {
       if (clientInterfacesRef.current) {
@@ -218,6 +219,12 @@ function App() {
             <>
               <Box sx={{ overflow: "hidden" }} ref={filterRef}>
                 <Box>
+                  <Typography sx={{ padding: "8px 0px" }} variant="body1">
+                    {doI18n(
+                      "pages:core-remote-resources:title_search_door43",
+                      i18nRef.current,
+                    )}
+                  </Typography>
                   <Chip
                     variant={selectedChips === 0 ? "filled" : "outlined"}
                     onClick={() => {
@@ -226,72 +233,29 @@ function App() {
                         setSelectedChips(0);
                       }
                     }}
+                    icon={selectedChips === 0 ? <Check /> : <CorporateFare />}
                     color="secondary"
-                    icon={selectedChips === 0 ? <Check /> : <PermIdentity />}
-                    sx={
-                      selectedChips === 1
-                        ? {
-                            borderTopRightRadius: 0,
-                            borderBottomRightRadius: 0,
-                            borderRightWidth: 0,
-                          }
-                        : {
-                            borderTopRightRadius: 0,
-                            borderBottomRightRadius: 0,
-                          }
-                    }
-                    label={doI18n(
-                      "pages:core-remote-resources:username",
+                    sx={{
+                      borderTopRightRadius: 0,
+                      borderBottomRightRadius: 0,
+                      borderRightWidth: 0,
+                      padding: -1,
+                    }}
+                    label={`${doI18n(
+                      "pages:core-remote-resources:organization&username",
                       i18nRef.current,
-                    )}
+                    )}`}
                   />
                   <Chip
                     variant={selectedChips === 1 ? "filled" : "outlined"}
-                    onClick={() => {
-                      if (selectedChips !== 1) {
-                        setShowTable(false);
-                        setSelectedChips(1);
-                      }
-                    }}
-                    icon={selectedChips === 1 ? <Check /> : <CorporateFare />}
-                    color="secondary"
-                    sx={
-                      selectedChips === 0
-                        ? {
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            padding: -1,
-                            borderTopRightRadius: 0,
-                            borderBottomRightRadius: 0,
-                            borderRightWidth: 0,
-                            borderLeftWidth: 0,
-                          }
-                        : {
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            borderTopRightRadius: 0,
-                            borderBottomRightRadius: 0,
-                            borderRightWidth: 0,
-                            borderLeftWidth: 0,
-
-                            padding: -1,
-                          }
-                    }
-                    label={doI18n(
-                      "pages:core-remote-resources:organization",
-                      i18nRef.current,
-                    )}
-                  />
-                  <Chip
-                    variant={selectedChips === 2 ? "filled" : "outlined"}
                     disabled={true}
                     onClick={() => {
                       setSelectedChips(2);
                     }}
-                    icon={selectedChips === 2 ? <Check /> : <Login />}
+                    icon={selectedChips === 1 ? <Check /> : <Login />}
                     color="secondary"
                     sx={
-                      selectedChips === 1
+                      selectedChips === 0
                         ? {
                             borderTopLeftRadius: 0,
                             borderBottomLeftRadius: 0,
@@ -308,76 +272,57 @@ function App() {
                     )}
                   />
                 </Box>
-                <Stack
-                  direction="row"
-                  spacing={0.5}
-                  alignItems="flex-start"
-                  sx={{ mt: 2 }}
-                >
-                  <TextField
-                    select
-                    slotProps={{
-                      select: {
-                        IconComponent: () => null,
-                      },
-                      input: {
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => {
-                                handleSetUsername();
-                                setShowTable(true);
-                              }}
-                              //onMouseDown={handleMouseDownPassword}
-                              //onMouseUp={handleMouseUpPassword}
-                              edge="end"
-                            >
-                              <SearchOutlinedIcon />
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      },
-                      inputLabel: { shrink: true },
-                    }}
-                    label={
-                      selectedChips === 0
-                        ? `${doI18n("pages:core-remote-resources:username", i18nRef.current)} *`
-                        : selectedChips === 1
-                          ? `${doI18n("pages:core-remote-resources:organization", i18nRef.current)} *`
-                          : `${doI18n("pages:core-remote-resources:my_account", i18nRef.current)} *`
+                <Autocomplete
+                  freeSolo
+                  options={nameOrganisation || []}
+                  getOptionLabel={(option) => option.name || option}
+                  onChange={(e, newValue) => {
+                    if (newValue?.url) {
+                      handleChange(newValue.name);
                     }
-                    color="secondary"
-                    size="small"
-                    variant="outlined"
-                    value={inputValue}
-                    sx={{ marginTop: 2 }}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        handleSetUsername();
-                        setShowTable(true);
-                      }
-                    }}
-                    helperText={doI18n(
-                      "pages:core-remote-resources:required_for_results",
-                      i18nRef.current,
-                    )}
-                  >
-                    {nameOrganisation.map((option) => (
-                      <MenuItem key={option.url} value={option.name}>
-                        {option.name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Stack>
+                  }}
+                  onInputChange={(e, newInputValue) => {
+                    handleChange(newInputValue);
+                  }}
+                  sx={{ padding: "8px 0px" }}
+                  renderInput={(params) => (
+                    <Grid2 container direction="row" alignItems="flex-end">
+                      <Grid2 item size={6}>
+                        <TextField
+                          required
+                          {...params}
+                          label="Search"
+                          size="small"
+                          color="secondary"
+                          variant="outlined"
+                          helperText={doI18n(
+                            "pages:core-remote-resources:required_for_results",
+                            i18nRef.current,
+                          )}
+                        />
+                      </Grid2>
+                      <Grid2 item size={2}>
+                        <Box sx={{ paddingBottom: "20px" }}>
+                          <IconButton
+                            disabled={!inputValue}
+                            onClick={() => {
+                              handleSetUsername();
+                              setShowTable(true);
+                            }}
+                          >
+                            <SearchOutlinedIcon />
+                          </IconButton>
+                        </Box>
+                      </Grid2>
+                    </Grid2>
+                  )}
+                />
               </Box>
 
               {searchWhitelist && showTable && (
                 <Box
                   sx={{
-                    height: `calc(100vh - ${filterHeight + 208}px)`,
+                    height: `calc(100vh - ${filterHeight + 190}px)`,
                     overflow: "hidden",
                   }}
                 >
