@@ -128,8 +128,9 @@
     "username": {
       "en": "Username"
     },
-    "organization": {
-      "en": "Organization"
+    "organization&username": {
+      "en": "Organization or Username",
+      "fr": "Organisation ou Nom d'utilisateur"
     },
     "my_account": {
       "en": "My account"
@@ -141,6 +142,10 @@
     "search": {
       "en": "Search",
       "es": "Buscar"
+    },
+    "title_search_door43": {
+      "en": "Search on Door43",
+      "fr": "Chercher sur Door43"
     }
   }
 }
