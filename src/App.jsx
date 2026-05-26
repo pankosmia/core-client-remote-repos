@@ -277,6 +277,7 @@ function App() {
                   direction="row"
                   alignItems="flex-start"
                   size={8}
+                  sx={{ paddingTop: "8px" }}
                 >
                   <Grid2 item size={6}>
                     <Autocomplete
