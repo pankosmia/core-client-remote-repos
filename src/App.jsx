@@ -272,22 +272,28 @@ function App() {
                     )}
                   />
                 </Box>
-                <Autocomplete
-                  freeSolo
-                  options={nameOrganisation || []}
-                  getOptionLabel={(option) => option.name || option}
-                  onChange={(e, newValue) => {
-                    if (newValue?.url) {
-                      handleChange(newValue.name);
-                    }
-                  }}
-                  onInputChange={(e, newInputValue) => {
-                    handleChange(newInputValue);
-                  }}
-                  sx={{ padding: "8px 0px" }}
-                  renderInput={(params) => (
-                    <Grid2 container direction="row" alignItems="flex-end">
-                      <Grid2 item size={6}>
+                <Grid2
+                  container
+                  direction="row"
+                  alignItems="flex-start"
+                  size={8}
+                  sx={{ paddingTop: "8px" }}
+                >
+                  <Grid2 item size={6}>
+                    <Autocomplete
+                      freeSolo
+                      options={nameOrganisation || []}
+                      getOptionLabel={(option) => option.name || option}
+                      onChange={(e, newValue) => {
+                        if (newValue?.url) {
+                          handleChange(newValue.name);
+                        }
+                      }}
+                      onInputChange={(e, newInputValue) => {
+                        handleChange(newInputValue);
+                      }}
+                      sx={{ padding: "8px 0px" }}
+                      renderInput={(params) => (
                         <TextField
                           required
                           {...params}
@@ -300,23 +306,23 @@ function App() {
                             i18nRef.current,
                           )}
                         />
-                      </Grid2>
-                      <Grid2 item size={2}>
-                        <Box sx={{ paddingBottom: "20px" }}>
-                          <IconButton
-                            disabled={!inputValue}
-                            onClick={() => {
-                              handleSetUsername();
-                              setShowTable(true);
-                            }}
-                          >
-                            <SearchOutlinedIcon />
-                          </IconButton>
-                        </Box>
-                      </Grid2>
-                    </Grid2>
-                  )}
-                />
+                      )}
+                    />
+                  </Grid2>
+                  <Grid2 item size={2}>
+                    <Box sx={{ marginTop: "8px" }}>
+                      <IconButton
+                        disabled={!inputValue}
+                        onClick={() => {
+                          handleSetUsername();
+                          setShowTable(true);
+                        }}
+                      >
+                        <SearchOutlinedIcon />
+                      </IconButton>
+                    </Box>
+                  </Grid2>
+                </Grid2>
               </Box>
 
               {searchWhitelist && showTable && (
