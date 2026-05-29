@@ -10,6 +10,12 @@ export default defineConfig({
     host: true,
     cors: true,
     origin: "http://localhost:8000",
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:19119", // Backend server
+        changeOrigin: true, // Ensure the request appears to come from the frontend server
+      },
+    },
   },
   build: {
     outDir: "build",

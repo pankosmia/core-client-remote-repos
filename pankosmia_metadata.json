@@ -3,7 +3,7 @@
   "require": {
     "net": true
   },
-  "minServerVersion": "0.13.0",
+  "minServerVersion": "0.16.1",
   "exclude_from_menu": true,
   "exclude_from_dashboard": true,
   "endpoints": {
