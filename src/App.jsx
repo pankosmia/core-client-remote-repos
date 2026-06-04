@@ -106,7 +106,7 @@ function App() {
   };
   useEffect(() => {
     getJson(
-      "/content-utils/product?resource_path=core-client-remote-repos/organizations/organization.json",
+      "/api/content-utils/product?resource_path=core-client-remote-repos/organizations/organization.json",
     )
       .then((res) => res.json)
       .then((data) => {
@@ -129,7 +129,7 @@ function App() {
     const formData = new FormData();
     formData.append("file", zipBlob);
 
-    fetchResponse = await fetch("/temp/bytes", {
+    fetchResponse = await fetch("/api/temp/bytes", {
       method: "POST",
       body: formData,
     });
@@ -152,8 +152,8 @@ function App() {
   async function DowloadBurrito(params, remoteRepoPath, postType) {
     const fetchUrl =
       postType === "clone"
-        ? `/git/clone-repo/${remoteRepoPath}`
-        : `/git/pull-repo/origin/${remoteRepoPath}`;
+        ? `/api/git/clone-repo/${remoteRepoPath}`
+        : `/api/git/pull-repo/origin/${remoteRepoPath}`;
 
     return await postEmptyJson(fetchUrl, debugRef.current);
   }
@@ -184,7 +184,6 @@ function App() {
           "create_document",
           "textTranslation",
         );
-        console.log(result);
         if (result) {
           setUrlLegacyContent(`/clients/${result.rootKey}#${result.url}`);
         }
@@ -202,7 +201,7 @@ function App() {
           backgroundPosition: "center",
           zIndex: -1,
           backgroundImage:
-            'url("/app-resources/pages/content/background_blur.png")',
+            'url("/api/app-resources/pages/content/background_blur.png")',
           backgroundRepeat: "no-repeat",
         }}
       >
