@@ -168,7 +168,6 @@ function App() {
 
   const handleChange = (value) => {
     setInputValue(value);
-    console.log(inputValue);
     const selectedOrg = nameOrganisation?.find((o) => o.name === value);
     if (selectedOrg) {
       setSearchWhitelist([[selectedOrg.url, `${selectedOrg.name} content`]]);
@@ -285,11 +284,11 @@ function App() {
                       getOptionLabel={(option) => option.name || option}
                       onChange={(e, newValue) => {
                         if (newValue?.url) {
-                          handleChange(newValue.name);
+                          setInputValue(newValue.name);
                         }
                       }}
                       onInputChange={(e, newInputValue) => {
-                        handleChange(newInputValue);
+                        setInputValue(newInputValue);
                       }}
                       sx={{ padding: "8px 0px" }}
                       renderInput={(params) => (
@@ -304,6 +303,14 @@ function App() {
                             "pages:core-remote-resources:required_for_results",
                             i18nRef.current,
                           )}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && inputValue) {
+                              e.preventDefault();
+                              handleChange(inputValue);
+                              handleSetUsername();
+                              setShowTable(true);
+                            }
+                          }}
                         />
                       )}
                     />
@@ -313,6 +320,7 @@ function App() {
                       <IconButton
                         disabled={!inputValue}
                         onClick={() => {
+                          handleChange(inputValue);
                           handleSetUsername();
                           setShowTable(true);
                         }}
