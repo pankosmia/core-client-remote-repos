@@ -277,10 +277,28 @@ function App() {
                       autoComplete={false}
                       value={inputValue || ""}
                       options={nameOrganisation || []}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && inputValue) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleChange(inputValue);
+                          setShowTable(true);
+                        }
+                      }}
                       getOptionLabel={(option) => option.name || option}
-                      onChange={(e, newValue) => {
+                      onChange={(event, newValue) => {
+                        if (!newValue) return;
+
+                        const value =
+                          typeof newValue === "string"
+                            ? newValue
+                            : newValue.name;
+
+                        setInputValue(value);
+
                         if (newValue?.url) {
-                          setInputValue(newValue.name);
+                          setShowTable(true);
+                          handleChange(value);
                         }
                       }}
                       onInputChange={(e, newInputValue) => {
@@ -299,14 +317,6 @@ function App() {
                             "pages:core-remote-resources:required_for_results",
                             i18nRef.current,
                           )}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && inputValue) {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleChange(inputValue);
-                              setShowTable(true);
-                            }
-                          }}
                         />
                       )}
                     />
