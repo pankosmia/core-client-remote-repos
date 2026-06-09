@@ -72,7 +72,6 @@ function App() {
   const { clientInterfacesRef } = useContext(clientInterfacesContext);
 
   /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
-  const [searchValue, setSearchValue] = useState(null);
   const [inputValue, setInputValue] = useState(null);
   const [searchWhitelist, setSearchWhitelist] = useState(null);
   const [selectedChips, setSelectedChips] = useState(0);
@@ -83,7 +82,6 @@ function App() {
   const typePageQuery = new URLSearchParams(window.location.search);
   const returnType = typePageQuery.get("returnTypePage");
   const [nameOrganisation, setNameOrganisation] = useState([]);
-
   const sourceWhitelist = useMemo(() => {
     return [["git.door43.org/uW", "uW"]];
   });
@@ -158,16 +156,11 @@ function App() {
     return await postEmptyJson(fetchUrl, debugRef.current);
   }
 
-  const handleSetUsername = () => {
-    if (inputValue.trim() === "") {
+  const handleChange = async (value) => {
+    if (value.trim() === "") {
       return;
     }
-
-    setSearchValue(inputValue.trim().toLowerCase());
-  };
-
-  const handleChange = (value) => {
-    setInputValue(value);
+    setInputValue(value.trim().toLowerCase());
     const selectedOrg = nameOrganisation?.find((o) => o.name === value);
     if (selectedOrg) {
       setSearchWhitelist([[selectedOrg.url, `${selectedOrg.name} content`]]);
@@ -175,6 +168,7 @@ function App() {
       setSearchWhitelist([[`git.door43.org/${value}`, `${value} content`]]);
     }
   };
+
   useEffect(() => {
     if (clientInterfacesRef.current) {
       if (clientInterfacesRef.current) {
@@ -280,6 +274,8 @@ function App() {
                   <Grid2 item size={6}>
                     <Autocomplete
                       freeSolo
+                      autoComplete={false}
+                      value={inputValue || ""}
                       options={nameOrganisation || []}
                       getOptionLabel={(option) => option.name || option}
                       onChange={(e, newValue) => {
@@ -306,8 +302,8 @@ function App() {
                           onKeyDown={(e) => {
                             if (e.key === "Enter" && inputValue) {
                               e.preventDefault();
+                              e.stopPropagation();
                               handleChange(inputValue);
-                              handleSetUsername();
                               setShowTable(true);
                             }
                           }}
@@ -321,7 +317,6 @@ function App() {
                         disabled={!inputValue}
                         onClick={() => {
                           handleChange(inputValue);
-                          handleSetUsername();
                           setShowTable(true);
                         }}
                       >
