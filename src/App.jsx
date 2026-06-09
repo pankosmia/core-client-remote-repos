@@ -72,7 +72,6 @@ function App() {
   const { clientInterfacesRef } = useContext(clientInterfacesContext);
 
   /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
-  const [searchValue, setSearchValue] = useState(null);
   const [inputValue, setInputValue] = useState(null);
   const [searchWhitelist, setSearchWhitelist] = useState(null);
   const [selectedChips, setSelectedChips] = useState(0);
@@ -83,7 +82,6 @@ function App() {
   const typePageQuery = new URLSearchParams(window.location.search);
   const returnType = typePageQuery.get("returnTypePage");
   const [nameOrganisation, setNameOrganisation] = useState([]);
-
   const sourceWhitelist = useMemo(() => {
     return [["git.door43.org/uW", "uW"]];
   });
@@ -158,17 +156,11 @@ function App() {
     return await postEmptyJson(fetchUrl, debugRef.current);
   }
 
-  const handleSetUsername = () => {
-    if (inputValue.trim() === "") {
+  const handleChange = async (value) => {
+    if (value.trim() === "") {
       return;
     }
-
-    setSearchValue(inputValue.trim().toLowerCase());
-  };
-
-  const handleChange = (value) => {
-    setInputValue(value);
-    console.log(inputValue);
+    setInputValue(value.trim().toLowerCase());
     const selectedOrg = nameOrganisation?.find((o) => o.name === value);
     if (selectedOrg) {
       setSearchWhitelist([[selectedOrg.url, `${selectedOrg.name} content`]]);
@@ -176,6 +168,7 @@ function App() {
       setSearchWhitelist([[`git.door43.org/${value}`, `${value} content`]]);
     }
   };
+
   useEffect(() => {
     if (clientInterfacesRef.current) {
       if (clientInterfacesRef.current) {
@@ -281,15 +274,35 @@ function App() {
                   <Grid2 item size={6}>
                     <Autocomplete
                       freeSolo
+                      autoComplete={false}
+                      value={inputValue || ""}
                       options={nameOrganisation || []}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && inputValue) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleChange(inputValue);
+                          setShowTable(true);
+                        }
+                      }}
                       getOptionLabel={(option) => option.name || option}
-                      onChange={(e, newValue) => {
+                      onChange={(event, newValue) => {
+                        if (!newValue) return;
+
+                        const value =
+                          typeof newValue === "string"
+                            ? newValue
+                            : newValue.name;
+
+                        setInputValue(value);
+
                         if (newValue?.url) {
-                          handleChange(newValue.name);
+                          setShowTable(true);
+                          handleChange(value);
                         }
                       }}
                       onInputChange={(e, newInputValue) => {
-                        handleChange(newInputValue);
+                        setInputValue(newInputValue);
                       }}
                       sx={{ padding: "8px 0px" }}
                       renderInput={(params) => (
@@ -313,7 +326,7 @@ function App() {
                       <IconButton
                         disabled={!inputValue}
                         onClick={() => {
-                          handleSetUsername();
+                          handleChange(inputValue);
                           setShowTable(true);
                         }}
                       >
