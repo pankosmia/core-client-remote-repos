@@ -18,76 +18,41 @@ import {
   PanDialog,
   PanDialogActions,
   debugContext,
-  clientInterfacesContext,
 } from "pankosmia-rcl";
-import { enqueueSnackbar } from "notistack";
 import { Check, CorporateFare, Login } from "@mui/icons-material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-function findEndpoint(config, targetKey, typeContent) {
-  for (const topLevelKey of Object.keys(config)) {
-    const result = walk(
-      config[topLevelKey],
-      topLevelKey,
-      null, // parentKey (none at start)
-      targetKey,
-      typeContent,
-    );
-    if (result) return result;
-  }
-  return null;
-}
-
-function walk(node, rootKey, parentKey, targetKey, typeContent) {
-  if (!node || typeof node !== "object") return null;
-
-  // 🎯 Found the endpoint with correct parent
-  if (
-    parentKey === typeContent &&
-    Object.prototype.hasOwnProperty.call(node, targetKey) &&
-    Array.isArray(node[targetKey]) &&
-    node[targetKey][0]?.url
-  ) {
-    return {
-      rootKey,
-      typeContent, // 👈 now explicit
-      endpoint: targetKey,
-      url: node[targetKey][0].url,
-    };
-  }
-
-  // 🔁 Recurse through children, passing current key as parent
-  for (const [key, value] of Object.entries(node)) {
-    const found = walk(value, rootKey, key, targetKey, typeContent);
-    if (found) return found;
-  }
-
-  return null;
-}
-
-// Usage
 
 function App() {
   const { debugRef } = useContext(debugContext);
   const { i18nRef } = useContext(i18nContext);
-  const { clientInterfacesRef } = useContext(clientInterfacesContext);
 
   /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
   const [inputValue, setInputValue] = useState(null);
   const [searchWhitelist, setSearchWhitelist] = useState(null);
   const [selectedChips, setSelectedChips] = useState(0);
-  const [urlLegacyContent, setUrlLegacyContent] = useState("");
   const filterRef = useRef(null);
   const [filterHeight, setFilterHeight] = useState(0);
   const [showTable, setShowTable] = useState(false);
   const typePageQuery = new URLSearchParams(window.location.search);
   const returnType = typePageQuery.get("returnTypePage");
   const [nameOrganisation, setNameOrganisation] = useState([]);
+
+  useEffect(() => {
+    if (!filterRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setFilterHeight(entry.contentRect.height);
+      }
+    });
+    observer.observe(filterRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   const sourceWhitelist = useMemo(() => {
     return [["git.door43.org/uW", "uW"]];
   });
-
   const defaultFilterProps = useMemo(() => {
-    const firstOrg = sourceWhitelist[0][0]; // "git.door43.org/BurritoTruck"
+    const firstOrg = sourceWhitelist[0][0]; // "git.door43.org/uW"
     return (row) => row.source.startsWith(firstOrg);
   }, [sourceWhitelist]);
 
@@ -113,40 +78,6 @@ function App() {
       .catch((err) => console.error("Error :", err));
   }, []);
 
-  async function DowloadLegacy(params, remoteRepoPath, postType) {
-    let fetchResponse;
-    const downloadResponse = await fetch(params.row.url);
-
-    if (!downloadResponse.ok) {
-      throw new Error(
-        doI18n("pages:core-client-rcl:failed_download", i18nRef.current),
-      );
-    }
-
-    const zipBlob = await downloadResponse.blob();
-    const formData = new FormData();
-    formData.append("file", zipBlob);
-
-    fetchResponse = await fetch("/api/temp/bytes", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!fetchResponse.ok) {
-      throw new Error(
-        doI18n("pages:core-client-rcl:upload_failed", i18nRef.current),
-      );
-    }
-
-    const data = await fetchResponse.json();
-    window.location.href = urlLegacyContent + `?uuid=${data.uuid}`;
-    enqueueSnackbar(
-      `${doI18n("pages:core-client-rcl:document_downloaded", i18nRef.current)} ${data.uuid}`,
-      { variant: "success" },
-    );
-    return fetchResponse;
-  }
-
   async function DowloadBurrito(params, remoteRepoPath, postType) {
     const fetchUrl =
       postType === "clone"
@@ -157,32 +88,24 @@ function App() {
   }
 
   const handleChange = async (value) => {
-    if (value.trim() === "") {
-      return;
-    }
-    setInputValue(value.trim().toLowerCase());
-    const selectedOrg = nameOrganisation?.find((o) => o.name === value);
-    if (selectedOrg) {
-      setSearchWhitelist([[selectedOrg.url, `${selectedOrg.name} content`]]);
-    } else {
+    if (value.trim() === "") return;
+    try {
+      const selectedOrg = nameOrganisation?.find((o) => o.name === value);
+      if (selectedOrg) {
+        setSearchWhitelist([[selectedOrg.url, `${selectedOrg.name} content`]]);
+      } else {
+        const endpoint = `https://git.door43.org/api/v1/users/${value}`;
+        const res = await getJson(endpoint);
+        const name = res.json?.username;
+        setSearchWhitelist([
+          [`git.door43.org/${name || value}`, `${name || value} content`],
+        ]);
+      }
+    } catch (err) {
       setSearchWhitelist([[`git.door43.org/${value}`, `${value} content`]]);
     }
   };
 
-  useEffect(() => {
-    if (clientInterfacesRef.current) {
-      if (clientInterfacesRef.current) {
-        let result = findEndpoint(
-          clientInterfacesRef.current,
-          "create_document",
-          "textTranslation",
-        );
-        if (result) {
-          setUrlLegacyContent(`/clients/${result.rootKey}#${result.url}`);
-        }
-      }
-    }
-  }, [clientInterfacesRef.current]);
   return (
     <Box>
       <Box
@@ -238,6 +161,7 @@ function App() {
                       i18nRef.current,
                     )}`}
                   />
+
                   <Chip
                     variant={selectedChips === 1 ? "filled" : "outlined"}
                     disabled={true}
@@ -340,18 +264,16 @@ function App() {
               {searchWhitelist && showTable && (
                 <Box
                   sx={{
-                    height: `calc(100vh - ${filterHeight + 190}px)`,
-                    overflow: "hidden",
+                    height: `calc(100vh - ${filterHeight}px)`,
+                    overflow: "auto",
                   }}
                 >
                   <PanDownload
                     downloadedType={
-                      selectedChips === 0 || selectedChips === 2
-                        ? "user"
-                        : "org"
+                      (selectedChips === 0 && "user") ||
+                      (selectedChips === 1 && "org")
                     }
                     downloadFunction={DowloadBurrito}
-                    downloadLegacyFunction={DowloadLegacy}
                     sources={searchWhitelist}
                     showColumnFilters={defaultFilterProps}
                     showFilterButtons={false}
