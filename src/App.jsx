@@ -267,7 +267,10 @@ function App() {
                     <Grid2 size={12}>
                       <Stack spacing={1}>
                         <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                          Results
+                          {doI18n(
+                            "pages:core-remote-resources:result",
+                            i18nRef.current,
+                          )}
                         </Typography>
                         <Typography variant="body1">
                           {doI18n(

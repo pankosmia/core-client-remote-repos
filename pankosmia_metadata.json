@@ -158,6 +158,10 @@
     "title_description": {
       "en": "Description:",
       "fr": "Description : "
+    },
+    "result": {
+      "en": "Results",
+      "fr": "Résultats"
     }
   }
 }
