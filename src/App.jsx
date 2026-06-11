@@ -11,6 +11,7 @@ import {
   Autocomplete,
   Grid2,
   Typography,
+  Stack,
 } from "@mui/material";
 import {
   PanDownload,
@@ -19,7 +20,7 @@ import {
   PanDialogActions,
   debugContext,
 } from "pankosmia-rcl";
-import { Check, CorporateFare, Login } from "@mui/icons-material";
+import { Check, CorporateFare, Description, Login } from "@mui/icons-material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 
 function App() {
@@ -36,6 +37,8 @@ function App() {
   const typePageQuery = new URLSearchParams(window.location.search);
   const returnType = typePageQuery.get("returnTypePage");
   const [nameOrganisation, setNameOrganisation] = useState([]);
+  const [full_name, setfull_name] = useState("");
+  const [orgDescription, setOrgDescription] = useState("");
 
   useEffect(() => {
     if (!filterRef.current) return;
@@ -89,20 +92,19 @@ function App() {
 
   const handleChange = async (value) => {
     if (value.trim() === "") return;
+    const newUrl = value.split("(");
     try {
-      const selectedOrg = nameOrganisation?.find((o) => o.name === value);
-      if (selectedOrg) {
-        setSearchWhitelist([[selectedOrg.url, `${selectedOrg.name} content`]]);
-      } else {
-        const endpoint = `https://git.door43.org/api/v1/users/${value}`;
-        const res = await getJson(endpoint);
-        const name = res.json?.username;
-        setSearchWhitelist([
-          [`git.door43.org/${name || value}`, `${name || value} content`],
-        ]);
-      }
+      const endpoint = `https://git.door43.org/api/v1/users/${newUrl[0]}`;
+      const res = await getJson(endpoint);
+      console.log("res", res);
+      const name = res.json?.username;
+      setfull_name(res.json?.full_name || res.json?.username);
+      setOrgDescription(res.json?.description);
+      setSearchWhitelist([
+        [`git.door43.org/${name || newUrl}`, `${name || newUrl} content`],
+      ]);
     } catch (err) {
-      setSearchWhitelist([[`git.door43.org/${value}`, `${value} content`]]);
+      setSearchWhitelist([[`git.door43.org/${newUrl}`, `${newUrl} content`]]);
     }
   };
 
@@ -134,7 +136,10 @@ function App() {
             <>
               <Box sx={{ overflow: "hidden" }} ref={filterRef}>
                 <Box>
-                  <Typography sx={{ padding: "8px 0px" }} variant="body1">
+                  <Typography
+                    sx={{ padding: "8px 0px", fontWeight: "bold" }}
+                    variant="body1"
+                  >
                     {doI18n(
                       "pages:core-remote-resources:title_search_door43",
                       i18nRef.current,
@@ -192,79 +197,104 @@ function App() {
                   container
                   direction="row"
                   alignItems="flex-start"
-                  size={8}
-                  sx={{ paddingTop: "8px" }}
+                  spacing={2}
+                  sx={{ padding: "8px" }}
                 >
-                  <Grid2 item size={6}>
-                    <Autocomplete
-                      freeSolo
-                      autoComplete={false}
-                      value={inputValue || ""}
-                      options={nameOrganisation || []}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && inputValue) {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleChange(inputValue);
-                          setShowTable(true);
-                        }
-                      }}
-                      getOptionLabel={(option) => option.name || option}
-                      onChange={(event, newValue) => {
-                        if (!newValue) return;
+                  <Grid2 size={4}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Autocomplete
+                        freeSolo
+                        autoComplete={false}
+                        value={inputValue || ""}
+                        options={nameOrganisation || []}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && inputValue) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleChange(inputValue);
+                            setShowTable(true);
+                          }
+                        }}
+                        getOptionLabel={(option) => option.name || option}
+                        onChange={(event, newValue) => {
+                          if (!newValue) return;
 
-                        const value =
-                          typeof newValue === "string"
-                            ? newValue
-                            : newValue.name;
+                          const value =
+                            typeof newValue === "string"
+                              ? newValue
+                              : newValue.name;
 
-                        setInputValue(value);
+                          setInputValue(value);
 
-                        if (newValue?.url) {
-                          setShowTable(true);
-                          handleChange(value);
-                        }
-                      }}
-                      onInputChange={(e, newInputValue) => {
-                        setInputValue(newInputValue);
-                      }}
-                      sx={{ padding: "8px 0px" }}
-                      renderInput={(params) => (
-                        <TextField
-                          required
-                          {...params}
-                          label="Search"
-                          size="small"
-                          color="secondary"
-                          variant="outlined"
-                          helperText={doI18n(
-                            "pages:core-remote-resources:required_for_results",
-                            i18nRef.current,
-                          )}
-                        />
-                      )}
-                    />
-                  </Grid2>
-                  <Grid2 item size={2}>
-                    <Box sx={{ marginTop: "8px" }}>
+                          if (newValue?.url) {
+                            setShowTable(true);
+                            handleChange(value);
+                          }
+                        }}
+                        onInputChange={(e, newInputValue) => {
+                          setInputValue(newInputValue);
+                        }}
+                        sx={{ flex: 1 }}
+                        renderInput={(params) => (
+                          <TextField
+                            required
+                            {...params}
+                            label="Search"
+                            size="small"
+                            color="secondary"
+                            variant="outlined"
+                            helperText={doI18n(
+                              "pages:core-remote-resources:required_for_results",
+                              i18nRef.current,
+                            )}
+                          />
+                        )}
+                      />
                       <IconButton
                         disabled={!inputValue}
                         onClick={() => {
                           handleChange(inputValue);
                           setShowTable(true);
                         }}
+                        sx={{ alignSelf: "flex-start", mt: "3px" }}
                       >
                         <SearchOutlinedIcon />
                       </IconButton>
                     </Box>
                   </Grid2>
+
+                  {full_name && (
+                    <Grid2 size={12}>
+                      <Stack spacing={1}>
+                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                          Results
+                        </Typography>
+                        <Typography variant="body1">
+                          {doI18n(
+                            "pages:core-remote-resources:title_organisation",
+                            i18nRef.current,
+                          )}{" "}
+                          {full_name}
+                        </Typography>
+                        {orgDescription && (
+                          <Typography variant="body1">
+                            {doI18n(
+                              "pages:core-remote-resources:title_description",
+                              i18nRef.current,
+                            )}{" "}
+                            {orgDescription}
+                          </Typography>
+                        )}
+                      </Stack>
+                    </Grid2>
+                  )}
                 </Grid2>
               </Box>
 
               {searchWhitelist && showTable && (
                 <Box
                   sx={{
-                    height: `calc(100vh - ${filterHeight}px)`,
+                    height: `calc(100vh - ${filterHeight + 450}px)`,
                     overflow: "auto",
                   }}
                 >

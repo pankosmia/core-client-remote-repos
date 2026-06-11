@@ -129,8 +129,8 @@
       "en": "Username"
     },
     "organization&username": {
-      "en": "Organization or Username",
-      "fr": "Organisation ou Nom d'utilisateur"
+      "en": "Organization or username",
+      "fr": "Organisation ou nom d'utilisateur"
     },
     "my_account": {
       "en": "My account"
@@ -146,6 +146,18 @@
     "title_search_door43": {
       "en": "Search on Door43",
       "fr": "Chercher sur Door43"
+    },
+    "title_result": {
+      "en": "Results",
+      "fr": "Résultats"
+    },
+    "title_organisation": {
+      "en": "Organization or username:",
+      "fr": "Organisation ou nom d'utilisateur :"
+    },
+    "title_description": {
+      "en": "Description:",
+      "fr": "Description : "
     }
   }
 }
