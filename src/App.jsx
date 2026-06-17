@@ -40,6 +40,28 @@ function App() {
   const [full_name, setfull_name] = useState("");
   const [orgDescription, setOrgDescription] = useState("");
 
+  const [userOptions, setUserOptions] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const searchTimeoutRef = useRef(null);
+
+  const searchUsers = async (query) => {
+    if (!query || query.trim().length < 2) return;
+
+    setLoadingUsers(true);
+
+    try {
+      const res = await getJson(
+        `https://git.door43.org/api/v1/users/search?q=${query}`,
+      );
+      console.log(res);
+      setUserOptions((res.json?.data ?? []).map((e) => e.username).slice(0, 7));
+    } catch (err) {
+      console.error(err);
+      setUserOptions([]);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
   useEffect(() => {
     if (!filterRef.current) return;
     const observer = new ResizeObserver((entries) => {
@@ -82,12 +104,35 @@ function App() {
   }, []);
 
   async function DowloadBurrito(params, remoteRepoPath, postType) {
-    const fetchUrl =
-      postType === "clone"
-        ? `/api/git/clone-repo/${remoteRepoPath}`
-        : `/api/git/pull-repo/origin/${remoteRepoPath}`;
+    let branches = (
+      await getJson(
+        `https://git.door43.org/api/v1/repos/${remoteRepoPath
+          .split("/")
+          .slice(1, 3)
+          .join("/")}/branches`,
+      )
+    ).json;
 
-    return await postEmptyJson(fetchUrl, debugRef.current);
+    ///search if main or scribe-main exist, make main the first elem.
+    branches = branches
+      .filter((e) => e.name === "main" || e.name === "scribe-main")
+      .sort((a, b) => (a.name === "main" ? -1 : 1));
+    for (const b of branches) {
+      const fetchUrl =
+        postType === "clone"
+          ? `/api/git/clone-repo/${remoteRepoPath}?branch=${b.name}`
+          : `/api/git/pull-repo/origin/${remoteRepoPath}`;
+      return await postEmptyJson(fetchUrl, debugRef.current);
+    }
+
+    return {
+      ok: false,
+      error: doI18n(
+        "pages:core-remote-resources:error_no_mains",
+        i18nRef.current,
+      ),
+      status: 404,
+    };
   }
 
   const handleChange = async (value) => {
@@ -206,7 +251,7 @@ function App() {
                         freeSolo
                         autoComplete={false}
                         value={inputValue || ""}
-                        options={nameOrganisation || []}
+                        options={inputValue ? userOptions : nameOrganisation}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && inputValue) {
                             e.preventDefault();
@@ -219,20 +264,29 @@ function App() {
                         onChange={(event, newValue) => {
                           if (!newValue) return;
 
+                          event?.preventDefault?.();
+                          event?.stopPropagation?.();
+
                           const value =
                             typeof newValue === "string"
                               ? newValue
-                              : newValue.name;
+                              : (newValue.name ?? newValue);
 
                           setInputValue(value);
 
-                          if (newValue?.url) {
-                            setShowTable(true);
-                            handleChange(value);
-                          }
+                          handleChange(value);
+                          setShowTable(true);
                         }}
                         onInputChange={(e, newInputValue) => {
                           setInputValue(newInputValue);
+
+                          if (searchTimeoutRef.current) {
+                            clearTimeout(searchTimeoutRef.current);
+                          }
+
+                          searchTimeoutRef.current = setTimeout(() => {
+                            searchUsers(newInputValue);
+                          }, 200); // ⬅️ delay in ms (adjust 300–600 is typical)
                         }}
                         sx={{ flex: 1 }}
                         renderInput={(params) => (
