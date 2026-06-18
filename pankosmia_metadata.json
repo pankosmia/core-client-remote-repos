@@ -162,6 +162,14 @@
     "result": {
       "en": "Results",
       "fr": "Résultats"
+    },
+    "error_no_mains": {
+      "en": "No branch named 'main' or 'scribe-main' was found.",
+      "fr": "Aucune branche nommée 'main' ou 'scribe-main' n'a été trouvée "
+    },
+    "failed": {
+      "en": "Failed",
+      "fr": "Echec"
     }
   }
 }
