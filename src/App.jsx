@@ -1,7 +1,8 @@
 import { useContext, useEffect, useRef } from "react";
 
 import { useMemo, useState } from "react";
-import { doI18n, getJson, postEmptyJson } from "pithekos-lib";
+import { getJson, postEmptyJson } from "pankosmia-lib/http";
+import { doI18n } from "pankosmia-lib/i18n";
 import {
   DialogContent,
   TextField,
