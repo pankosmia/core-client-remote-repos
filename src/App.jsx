@@ -40,21 +40,37 @@ function App() {
   const [nameOrganisation, setNameOrganisation] = useState([]);
   const [full_name, setfull_name] = useState("");
   const [orgDescription, setOrgDescription] = useState("");
-
+  const [orgOptions, setOrgOptions] = useState([]);
   const [userOptions, setUserOptions] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const searchTimeoutRef = useRef(null);
+  const [orgMatches, setOrgMatches] = useState([]);
+
+  const searchOrg = async () => {
+    const res = await getJson(`https://git.door43.org/api/v1/orgs`);
+    setOrgOptions(res.json.map((e) => e.name));
+  };
+
+  const filterOrg = (query) => {
+    if (!query || query.trim().length < 2) return [];
+    const q = query.toLowerCase();
+    return orgOptions
+      .filter((name) => name.toLowerCase().startsWith(q))
+      .slice(0, 5);
+  };
+
+  useEffect(() => {
+    searchOrg();
+  }, []);
 
   const searchUsers = async (query) => {
     if (!query || query.trim().length < 2) return;
 
     setLoadingUsers(true);
-
     try {
       const res = await getJson(
         `https://git.door43.org/api/v1/users/search?q=${query}`,
       );
-      console.log(res);
       setUserOptions((res.json?.data ?? []).map((e) => e.username).slice(0, 7));
     } catch (err) {
       console.error(err);
@@ -63,6 +79,15 @@ function App() {
       setLoadingUsers(false);
     }
   };
+
+  useEffect(() => {
+    setOrgMatches(filterOrg(inputValue));
+  }, [inputValue, orgOptions]);
+
+  const combinedOptions = useMemo(() => {
+    return [...new Set([...orgMatches, ...userOptions])];
+  }, [orgMatches, userOptions]);
+
   useEffect(() => {
     if (!filterRef.current) return;
     const observer = new ResizeObserver((entries) => {
@@ -252,7 +277,9 @@ function App() {
                         freeSolo
                         autoComplete={false}
                         value={inputValue || ""}
-                        options={inputValue ? userOptions : nameOrganisation}
+                        options={
+                          inputValue ? combinedOptions : nameOrganisation
+                        }
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && inputValue) {
                             e.preventDefault();
@@ -287,6 +314,7 @@ function App() {
 
                           searchTimeoutRef.current = setTimeout(() => {
                             searchUsers(newInputValue);
+                            searchOrg(filterOrg(newInputValue));
                           }, 200); // ⬅️ delay in ms (adjust 300–600 is typical)
                         }}
                         sx={{ flex: 1 }}
