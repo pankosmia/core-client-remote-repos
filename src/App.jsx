@@ -71,7 +71,7 @@ function App() {
       const res = await getJson(
         `https://git.door43.org/api/v1/users/search?q=${query}`,
       );
-      setUserOptions((res.json?.data ?? []).map((e) => e.username).slice(0, 7));
+      setUserOptions((res.json?.data ?? []).map((e) => e.username).slice(0, 5));
     } catch (err) {
       console.error(err);
       setUserOptions([]);
