@@ -314,7 +314,6 @@ function App() {
 
                           searchTimeoutRef.current = setTimeout(() => {
                             searchUsers(newInputValue);
-                            searchOrg(filterOrg(newInputValue));
                           }, 200); // ⬅️ delay in ms (adjust 300–600 is typical)
                         }}
                         sx={{ flex: 1 }}
