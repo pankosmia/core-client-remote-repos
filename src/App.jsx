@@ -20,6 +20,8 @@ import {
   PanDialog,
   PanDialogActions,
   debugContext,
+  productContext,
+  ScrollableBody,
 } from "pankosmia-rcl";
 import { Check, CorporateFare, Description, Login } from "@mui/icons-material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
@@ -27,6 +29,9 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 function App() {
   const { debugRef } = useContext(debugContext);
   const { i18nRef } = useContext(i18nContext);
+  const { productRef } = useContext(productContext);
+  let isAndroid =
+    productRef && productRef.current && productRef.current.os === "android";
 
   /** adjSelectedFontClass reshapes selectedFontClass if Graphite is absent. */
   const [inputValue, setInputValue] = useState(null);
@@ -180,235 +185,242 @@ function App() {
   };
 
   return (
-    <Box>
-      <Box
-        sx={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          zIndex: -1,
-          backgroundImage:
-            'url("/api/app-resources/pages/content/background_blur.png")',
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        <PanDialog
-          titleLabel={doI18n(
-            "pages:core-remote-resources:download_from_internet",
-            i18nRef.current,
-          )}
-          isOpen={true}
-          closeFn={closeDialog}
-          size="lg"
+    <ScrollableBody isAndroid={isAndroid}>
+      <Box>
+        <Box
+          sx={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            zIndex: -1,
+            backgroundImage:
+              'url("/api/app-resources/pages/content/background_blur.png")',
+            backgroundRepeat: "no-repeat",
+          }}
         >
-          <DialogContent sx={{ overflow: "hidden" }}>
-            <>
-              <Box sx={{ overflow: "hidden" }} ref={filterRef}>
-                <Box>
-                  <Typography
-                    sx={{ padding: "8px 0px", fontWeight: "bold" }}
-                    variant="body1"
-                  >
-                    {doI18n(
-                      "pages:core-remote-resources:title_search_door43",
-                      i18nRef.current,
-                    )}
-                  </Typography>
-                  <Chip
-                    variant={selectedChips === 0 ? "filled" : "outlined"}
-                    onClick={() => {
-                      if (selectedChips !== 0) {
-                        setShowTable(false);
-                        setSelectedChips(0);
-                      }
-                    }}
-                    icon={selectedChips === 0 ? <Check /> : <CorporateFare />}
-                    color="secondary"
-                    sx={{
-                      borderTopRightRadius: 0,
-                      borderBottomRightRadius: 0,
-                      borderRightWidth: 0,
-                      padding: -1,
-                    }}
-                    label={`${doI18n(
-                      "pages:core-remote-resources:organization&username",
-                      i18nRef.current,
-                    )}`}
-                  />
-
-                  <Chip
-                    variant={selectedChips === 1 ? "filled" : "outlined"}
-                    disabled={true}
-                    onClick={() => {
-                      setSelectedChips(2);
-                    }}
-                    icon={selectedChips === 1 ? <Check /> : <Login />}
-                    color="secondary"
-                    sx={
-                      selectedChips === 0
-                        ? {
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            borderLeftWidth: 0,
-                          }
-                        : {
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                          }
-                    }
-                    label={doI18n(
-                      "pages:core-remote-resources:my_account",
-                      i18nRef.current,
-                    )}
-                  />
-                </Box>
-                <Grid2
-                  container
-                  direction="row"
-                  alignItems="flex-start"
-                  spacing={2}
-                  sx={{ padding: "8px" }}
-                >
-                  <Grid2 size={4}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Autocomplete
-                        freeSolo
-                        autoComplete={false}
-                        value={inputValue || ""}
-                        options={
-                          inputValue ? combinedOptions : nameOrganisation
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && inputValue) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleChange(inputValue);
-                            setShowTable(true);
-                          }
-                        }}
-                        getOptionLabel={(option) => option.name || option}
-                        onChange={(event, newValue) => {
-                          if (!newValue) return;
-
-                          event?.preventDefault?.();
-                          event?.stopPropagation?.();
-
-                          const value =
-                            typeof newValue === "string"
-                              ? newValue
-                              : (newValue.name ?? newValue);
-
-                          setInputValue(value);
-
-                          handleChange(value);
-                          setShowTable(true);
-                        }}
-                        onInputChange={(e, newInputValue) => {
-                          setInputValue(newInputValue);
-
-                          if (searchTimeoutRef.current) {
-                            clearTimeout(searchTimeoutRef.current);
-                          }
-
-                          searchTimeoutRef.current = setTimeout(() => {
-                            searchUsers(newInputValue);
-                          }, 200); // ⬅️ delay in ms (adjust 300–600 is typical)
-                        }}
-                        sx={{ flex: 1 }}
-                        renderInput={(params) => (
-                          <TextField
-                            required
-                            {...params}
-                            label="Search"
-                            size="small"
-                            color="secondary"
-                            variant="outlined"
-                            helperText={doI18n(
-                              "pages:core-remote-resources:required_for_results",
-                              i18nRef.current,
-                            )}
-                          />
-                        )}
-                      />
-                      <IconButton
-                        disabled={!inputValue}
-                        onClick={() => {
-                          handleChange(inputValue);
-                          setShowTable(true);
-                        }}
-                        sx={{ alignSelf: "flex-start", mt: "3px" }}
-                      >
-                        <SearchOutlinedIcon />
-                      </IconButton>
-                    </Box>
-                  </Grid2>
-
-                  {full_name && (
-                    <Grid2 size={12}>
-                      <Stack spacing={1}>
-                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                          {doI18n(
-                            "pages:core-remote-resources:result",
-                            i18nRef.current,
-                          )}
-                        </Typography>
-                        <Typography variant="body1">
-                          {doI18n(
-                            "pages:core-remote-resources:title_organisation",
-                            i18nRef.current,
-                          )}{" "}
-                          {full_name}
-                        </Typography>
-                        {orgDescription && (
-                          <Typography variant="body1">
-                            {doI18n(
-                              "pages:core-remote-resources:title_description",
-                              i18nRef.current,
-                            )}{" "}
-                            {orgDescription}
-                          </Typography>
-                        )}
-                      </Stack>
-                    </Grid2>
-                  )}
-                </Grid2>
-              </Box>
-
-              {searchWhitelist && showTable && (
-                <Box
-                  sx={{
-                    height: `calc(100vh - ${filterHeight + 450}px)`,
-                    overflow: "auto",
-                  }}
-                >
-                  <PanDownload
-                    downloadedType={
-                      (selectedChips === 0 && "user") ||
-                      (selectedChips === 1 && "org")
-                    }
-                    downloadFunction={DowloadBurrito}
-                    sources={searchWhitelist}
-                    showColumnFilters={defaultFilterProps}
-                    showFilterButtons={false}
-                    sx={{ flex: 1 }}
-                  />
-                </Box>
-              )}
-            </>
-          </DialogContent>
-          <PanDialogActions
-            actionFn={closeDialog}
-            actionLabel={doI18n(
-              "pages:core-remote-resources:close",
+          <PanDialog
+            titleLabel={doI18n(
+              "pages:core-remote-resources:download_from_internet",
               i18nRef.current,
             )}
-            actionVariant="contained"
-          />
-        </PanDialog>
+            isOpen={true}
+            closeFn={closeDialog}
+            size="lg"
+          >
+            <DialogContent sx={{ overflow: "hidden" }}>
+              <>
+                <Box sx={{ overflow: "hidden" }} ref={filterRef}>
+                  <Box>
+                    <Typography
+                      sx={{ padding: "8px 0px", fontWeight: "bold" }}
+                      variant="body1"
+                    >
+                      {doI18n(
+                        "pages:core-remote-resources:title_search_door43",
+                        i18nRef.current,
+                      )}
+                    </Typography>
+                    <Chip
+                      variant={selectedChips === 0 ? "filled" : "outlined"}
+                      onClick={() => {
+                        if (selectedChips !== 0) {
+                          setShowTable(false);
+                          setSelectedChips(0);
+                        }
+                      }}
+                      icon={selectedChips === 0 ? <Check /> : <CorporateFare />}
+                      color="secondary"
+                      sx={{
+                        borderTopRightRadius: 0,
+                        borderBottomRightRadius: 0,
+                        borderRightWidth: 0,
+                        padding: -1,
+                      }}
+                      label={`${doI18n(
+                        "pages:core-remote-resources:organization&username",
+                        i18nRef.current,
+                      )}`}
+                    />
+
+                    <Chip
+                      variant={selectedChips === 1 ? "filled" : "outlined"}
+                      disabled={true}
+                      onClick={() => {
+                        setSelectedChips(2);
+                      }}
+                      icon={selectedChips === 1 ? <Check /> : <Login />}
+                      color="secondary"
+                      sx={
+                        selectedChips === 0
+                          ? {
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeftWidth: 0,
+                            }
+                          : {
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                            }
+                      }
+                      label={doI18n(
+                        "pages:core-remote-resources:my_account",
+                        i18nRef.current,
+                      )}
+                    />
+                  </Box>
+                  <Grid2
+                    container
+                    direction="row"
+                    alignItems="flex-start"
+                    spacing={2}
+                    sx={{ padding: "8px" }}
+                  >
+                    <Grid2 size={4}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <Autocomplete
+                          freeSolo
+                          autoComplete={false}
+                          value={inputValue || ""}
+                          options={
+                            inputValue ? combinedOptions : nameOrganisation
+                          }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && inputValue) {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleChange(inputValue);
+                              setShowTable(true);
+                            }
+                          }}
+                          getOptionLabel={(option) => option.name || option}
+                          onChange={(event, newValue) => {
+                            if (!newValue) return;
+
+                            event?.preventDefault?.();
+                            event?.stopPropagation?.();
+
+                            const value =
+                              typeof newValue === "string"
+                                ? newValue
+                                : (newValue.name ?? newValue);
+
+                            setInputValue(value);
+
+                            handleChange(value);
+                            setShowTable(true);
+                          }}
+                          onInputChange={(e, newInputValue) => {
+                            setInputValue(newInputValue);
+
+                            if (searchTimeoutRef.current) {
+                              clearTimeout(searchTimeoutRef.current);
+                            }
+
+                            searchTimeoutRef.current = setTimeout(() => {
+                              searchUsers(newInputValue);
+                            }, 200); // ⬅️ delay in ms (adjust 300–600 is typical)
+                          }}
+                          sx={{ flex: 1 }}
+                          renderInput={(params) => (
+                            <TextField
+                              required
+                              {...params}
+                              label="Search"
+                              size="small"
+                              color="secondary"
+                              variant="outlined"
+                              helperText={doI18n(
+                                "pages:core-remote-resources:required_for_results",
+                                i18nRef.current,
+                              )}
+                            />
+                          )}
+                        />
+                        <IconButton
+                          disabled={!inputValue}
+                          onClick={() => {
+                            handleChange(inputValue);
+                            setShowTable(true);
+                          }}
+                          sx={{ alignSelf: "flex-start", mt: "3px" }}
+                        >
+                          <SearchOutlinedIcon />
+                        </IconButton>
+                      </Box>
+                    </Grid2>
+
+                    {full_name && (
+                      <Grid2 size={12}>
+                        <Stack spacing={1}>
+                          <Typography
+                            variant="body1"
+                            sx={{ fontWeight: "bold" }}
+                          >
+                            {doI18n(
+                              "pages:core-remote-resources:result",
+                              i18nRef.current,
+                            )}
+                          </Typography>
+                          <Typography variant="body1">
+                            {doI18n(
+                              "pages:core-remote-resources:title_organisation",
+                              i18nRef.current,
+                            )}{" "}
+                            {full_name}
+                          </Typography>
+                          {orgDescription && (
+                            <Typography variant="body1">
+                              {doI18n(
+                                "pages:core-remote-resources:title_description",
+                                i18nRef.current,
+                              )}{" "}
+                              {orgDescription}
+                            </Typography>
+                          )}
+                        </Stack>
+                      </Grid2>
+                    )}
+                  </Grid2>
+                </Box>
+
+                {searchWhitelist && showTable && (
+                  <Box
+                    sx={{
+                      height: `calc(100vh - ${filterHeight + 450}px)`,
+                      overflow: "auto",
+                    }}
+                  >
+                    <PanDownload
+                      downloadedType={
+                        (selectedChips === 0 && "user") ||
+                        (selectedChips === 1 && "org")
+                      }
+                      downloadFunction={DowloadBurrito}
+                      sources={searchWhitelist}
+                      showColumnFilters={defaultFilterProps}
+                      showFilterButtons={false}
+                      sx={{ flex: 1 }}
+                    />
+                  </Box>
+                )}
+              </>
+            </DialogContent>
+            <PanDialogActions
+              actionFn={closeDialog}
+              actionLabel={doI18n(
+                "pages:core-remote-resources:close",
+                i18nRef.current,
+              )}
+              actionVariant="contained"
+            />
+          </PanDialog>
+        </Box>
       </Box>
-    </Box>
+    </ScrollableBody>
   );
 }
 
