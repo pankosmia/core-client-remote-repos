@@ -35,8 +35,8 @@ importers:
         specifier: ^0.0.3
         version: 0.0.3
       pankosmia-rcl:
-        specifier: 0.4.21
-        version: 0.4.21(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@7.2.0)(typescript@7.0.2)
+        specifier: 0.4.22
+        version: 0.4.22(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@7.2.0)(typescript@7.0.2)
       react:
         specifier: ^17.0.0 || ^18.0.0
         version: 18.3.1
@@ -3947,19 +3947,19 @@ packages:
         integrity: sha512-aOANGTQvag5anAadz7Jn52wQYhJiDlEDPT6pRBXzEf9JecKyvW1sQL82wTFdeRU8PRJghIl1oMW9AhFBocPr9g==,
       }
 
-  pankosmia-rcl@0.4.14:
+  pankosmia-rcl@0.4.21:
     resolution:
       {
-        integrity: sha512-RJFGclCNZJ6qcfBjLqKv+fBu2vfhp5lcY9grbzsGzUV9vR2oIWgFwHGkpR0TmPxYolcpFrdaNtl+5R+1GAMIzQ==,
+        integrity: sha512-mHs5SxkDzHiLwTdHGAEVZ4hiZj1ezHIW2xfSgXL/FOab/iJ9QLQwJA5ecKiisy0U7Xd01SCxbrXPYlceVZMXTw==,
       }
     peerDependencies:
       react: ^17.0.0 || ^18.0.0
       react-dom: ^17.0.0 || ^18.0.0
 
-  pankosmia-rcl@0.4.21:
+  pankosmia-rcl@0.4.22:
     resolution:
       {
-        integrity: sha512-mHs5SxkDzHiLwTdHGAEVZ4hiZj1ezHIW2xfSgXL/FOab/iJ9QLQwJA5ecKiisy0U7Xd01SCxbrXPYlceVZMXTw==,
+        integrity: sha512-5q04h5UJH98aoThhG6OhCvHReSaVPGJIWTnBEOias0OCWvqgIaoh070hlJEvNo2aFXHce8XTj650dIuOI4ncow==,
       }
     peerDependencies:
       react: ^17.0.0 || ^18.0.0
@@ -7468,7 +7468,7 @@ snapshots:
 
   pankosmia-lib@0.0.3: {}
 
-  pankosmia-rcl@0.4.14(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@7.2.0)(typescript@7.0.2):
+  pankosmia-rcl@0.4.21(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@7.2.0)(typescript@7.0.2):
     dependencies:
       "@emotion/react": 11.14.0(@types/react@19.2.18)(react@18.3.1)(supports-color@7.2.0)
       "@emotion/styled": 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@18.3.1)(supports-color@7.2.0))(@types/react@19.2.18)(react@18.3.1)(supports-color@7.2.0)
@@ -7493,7 +7493,7 @@ snapshots:
       - supports-color
       - typescript
 
-  pankosmia-rcl@0.4.21(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@7.2.0)(typescript@7.0.2):
+  pankosmia-rcl@0.4.22(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@7.2.0)(typescript@7.0.2):
     dependencies:
       "@emotion/react": 11.14.0(@types/react@19.2.18)(react@18.3.1)(supports-color@7.2.0)
       "@emotion/styled": 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@18.3.1)(supports-color@7.2.0))(@types/react@19.2.18)(react@18.3.1)(supports-color@7.2.0)
@@ -7504,7 +7504,7 @@ snapshots:
       eslint-config-react-app: 7.0.1(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(eslint@8.57.1(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
       notistack: 3.0.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       pankosmia-lib: 0.0.3
-      pankosmia-rcl: 0.4.14(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@7.2.0)(typescript@7.0.2)
+      pankosmia-rcl: 0.4.21(@babel/plugin-syntax-flow@7.29.7(@babel/core@7.29.7(supports-color@7.2.0)))(@babel/plugin-transform-react-jsx@7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0))(@types/react@19.2.18)(eslint@8.57.1(supports-color@7.2.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@7.2.0)(typescript@7.0.2)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     transitivePeerDependencies:
