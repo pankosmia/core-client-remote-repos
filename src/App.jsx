@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef } from "react";
 
 import { useMemo, useState } from "react";
-import { getJson, postEmptyJson } from "pankosmia-lib/http";
+import { getJson, postEmptyJson, getAndSetJson } from "pankosmia-lib/http";
 import { doI18n } from "pankosmia-lib/i18n";
 import {
   DialogContent,
@@ -51,6 +51,13 @@ function App() {
   const searchTimeoutRef = useRef(null);
   const [orgMatches, setOrgMatches] = useState([]);
   const [isDownloadingAny, setIsDownloadingAny] = useState(false);
+  const [languageLookup, setLanguageLookup] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/app-resources/lookups/languages.json")
+      .then((r) => r.json())
+      .then((data) => setLanguageLookup(data));
+  }, []);
 
   const fetchAllRemoteOrgs = async () => {
     let all = [];
@@ -428,6 +435,7 @@ function App() {
                       showColumnFilters={defaultFilterProps}
                       showFilterButtons={false}
                       onDownloadingChange={setIsDownloadingAny}
+                      languageLookup={languageLookup}
                       sx={{ flex: 1 }}
                     />
                   </Box>
