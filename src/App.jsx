@@ -10,7 +10,7 @@ import {
   Chip,
   IconButton,
   Autocomplete,
-  Grid2,
+  Grid,
   Typography,
   Stack,
 } from "@mui/material";
@@ -50,6 +50,7 @@ function App() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const searchTimeoutRef = useRef(null);
   const [orgMatches, setOrgMatches] = useState([]);
+  const [isDownloadingAny, setIsDownloadingAny] = useState(false);
 
   const fetchAllRemoteOrgs = async () => {
     let all = [];
@@ -228,6 +229,7 @@ function App() {
             isOpen={true}
             closeFn={closeDialog}
             size="lg"
+            isLoading={isDownloadingAny}
           >
             <DialogContent sx={{ overflow: "hidden" }}>
               <>
@@ -290,14 +292,16 @@ function App() {
                       )}
                     />
                   </Box>
-                  <Grid2
+                  <Grid
                     container
                     direction="row"
-                    alignItems="flex-start"
                     spacing={2}
-                    sx={{ padding: "8px" }}
+                    sx={{
+                      alignItems: "flex-start",
+                      padding: "8px",
+                    }}
                   >
-                    <Grid2 size={4}>
+                    <Grid size={4}>
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
@@ -371,10 +375,10 @@ function App() {
                           <SearchOutlinedIcon />
                         </IconButton>
                       </Box>
-                    </Grid2>
+                    </Grid>
 
                     {full_name && (
-                      <Grid2 size={12}>
+                      <Grid size={12}>
                         <Stack spacing={1}>
                           <Typography
                             variant="body1"
@@ -402,9 +406,9 @@ function App() {
                             </Typography>
                           )}
                         </Stack>
-                      </Grid2>
+                      </Grid>
                     )}
-                  </Grid2>
+                  </Grid>
                 </Box>
 
                 {searchWhitelist && showTable && (
@@ -423,6 +427,7 @@ function App() {
                       sources={searchWhitelist}
                       showColumnFilters={defaultFilterProps}
                       showFilterButtons={false}
+                      onDownloadingChange={setIsDownloadingAny}
                       sx={{ flex: 1 }}
                     />
                   </Box>
@@ -430,12 +435,18 @@ function App() {
               </>
             </DialogContent>
             <PanDialogActions
-              actionFn={closeDialog}
-              actionLabel={doI18n(
+              closeFn={closeDialog}
+              closeLabel={doI18n(
                 "pages:core-remote-resources:close",
                 i18nRef.current,
               )}
-              actionVariant="contained"
+              loadingLabel={doI18n(
+                "pages:core-remote-resources:downloading",
+                i18nRef.current,
+              )}
+              closeVariant="contained"
+              isLoading={isDownloadingAny}
+              onlyCloseButton={true}
             />
           </PanDialog>
         </Box>
