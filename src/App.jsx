@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef } from "react";
 
 import { useMemo, useState } from "react";
-import { getJson, postEmptyJson } from "pankosmia-lib/http";
+import { getJson, postEmptyJson, getAndSetJson } from "pankosmia-lib/http";
 import { doI18n } from "pankosmia-lib/i18n";
 import {
   DialogContent,
@@ -10,7 +10,7 @@ import {
   Chip,
   IconButton,
   Autocomplete,
-  Grid2,
+  Grid,
   Typography,
   Stack,
 } from "@mui/material";
@@ -45,27 +45,55 @@ function App() {
   const [nameOrganisation, setNameOrganisation] = useState([]);
   const [full_name, setfull_name] = useState("");
   const [orgDescription, setOrgDescription] = useState("");
-  const [orgOptions, setOrgOptions] = useState([]);
+  const [orgPool, setOrgPool] = useState([]);
   const [userOptions, setUserOptions] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const searchTimeoutRef = useRef(null);
   const [orgMatches, setOrgMatches] = useState([]);
+  const [isDownloadingAny, setIsDownloadingAny] = useState(false);
+  const [languageLookup, setLanguageLookup] = useState([]);
 
-  const searchOrg = async () => {
-    const res = await getJson(`https://git.door43.org/api/v1/orgs`);
-    setOrgOptions(res.json.map((e) => e.name));
+  useEffect(() => {
+    fetch("/api/app-resources/lookups/languages.json")
+      .then((r) => r.json())
+      .then((data) => setLanguageLookup(data));
+  }, []);
+
+  const fetchAllRemoteOrgs = async () => {
+    let all = [];
+    let page = 1;
+    const limit = 50;
+    while (true) {
+      const res = await getJson(
+        `https://git.door43.org/api/v1/orgs?limit=${limit}&page=${page}`,
+      );
+      const batch = res.json || [];
+      all = all.concat(batch.map((e) => e.name));
+      if (batch.length < limit) break;
+      page += 1;
+    }
+    return all;
   };
 
   const filterOrg = (query) => {
     if (!query || query.trim().length < 2) return [];
     const q = query.toLowerCase();
-    return orgOptions
-      .filter((name) => name.toLowerCase().startsWith(q))
-      .slice(0, 5);
+    const normalizedNames = nameOrganisation
+      .map((o) => (typeof o === "string" ? o : o?.name))
+      .filter(Boolean);
+    const pool = [...new Set([...normalizedNames, ...orgPool])];
+    return pool.filter((name) => name.toLowerCase().includes(q)).slice(0, 5);
   };
 
   useEffect(() => {
-    searchOrg();
+    (async () => {
+      try {
+        const remoteOrgs = await fetchAllRemoteOrgs();
+        setOrgPool((prev) => [...new Set([...prev, ...remoteOrgs])]);
+      } catch (err) {
+        console.error("Error fetching remote orgs:", err);
+      }
+    })();
   }, []);
 
   const searchUsers = async (query) => {
@@ -87,7 +115,7 @@ function App() {
 
   useEffect(() => {
     setOrgMatches(filterOrg(inputValue));
-  }, [inputValue, orgOptions]);
+  }, [inputValue, orgPool]);
 
   const combinedOptions = useMemo(() => {
     return [...new Set([...orgMatches, ...userOptions])];
@@ -208,6 +236,7 @@ function App() {
             isOpen={true}
             closeFn={closeDialog}
             size="lg"
+            isLoading={isDownloadingAny}
           >
             <DialogContent sx={{ overflow: "hidden" }}>
               <>
@@ -270,14 +299,16 @@ function App() {
                       )}
                     />
                   </Box>
-                  <Grid2
+                  <Grid
                     container
                     direction="row"
-                    alignItems="flex-start"
                     spacing={2}
-                    sx={{ padding: "8px" }}
+                    sx={{
+                      alignItems: "flex-start",
+                      padding: "8px",
+                    }}
                   >
-                    <Grid2 size={4}>
+                    <Grid size={4}>
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
@@ -351,10 +382,10 @@ function App() {
                           <SearchOutlinedIcon />
                         </IconButton>
                       </Box>
-                    </Grid2>
+                    </Grid>
 
                     {full_name && (
-                      <Grid2 size={12}>
+                      <Grid size={12}>
                         <Stack spacing={1}>
                           <Typography
                             variant="body1"
@@ -382,9 +413,9 @@ function App() {
                             </Typography>
                           )}
                         </Stack>
-                      </Grid2>
+                      </Grid>
                     )}
-                  </Grid2>
+                  </Grid>
                 </Box>
 
                 {searchWhitelist && showTable && (
@@ -403,6 +434,8 @@ function App() {
                       sources={searchWhitelist}
                       showColumnFilters={defaultFilterProps}
                       showFilterButtons={false}
+                      onDownloadingChange={setIsDownloadingAny}
+                      languageLookup={languageLookup}
                       sx={{ flex: 1 }}
                     />
                   </Box>
@@ -410,12 +443,18 @@ function App() {
               </>
             </DialogContent>
             <PanDialogActions
-              actionFn={closeDialog}
-              actionLabel={doI18n(
+              closeFn={closeDialog}
+              closeLabel={doI18n(
                 "pages:core-remote-resources:close",
                 i18nRef.current,
               )}
-              actionVariant="contained"
+              loadingLabel={doI18n(
+                "pages:core-remote-resources:downloading",
+                i18nRef.current,
+              )}
+              closeVariant="contained"
+              isLoading={isDownloadingAny}
+              onlyCloseButton={true}
             />
           </PanDialog>
         </Box>
