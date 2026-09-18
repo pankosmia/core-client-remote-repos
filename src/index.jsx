@@ -7,7 +7,7 @@ import { ThemeProvider } from "@emotion/react";
 import { MaterialDesignContent, SnackbarProvider } from "notistack";
 import { useEffect, useState } from "react";
 import { createTheme, styled } from "@mui/material";
-import { getAndSetJson } from "pithekos-lib";
+import { getAndSetJson } from "pankosmia-lib/http";
 
 const typePageQuery = new URLSearchParams(window.location.search);
 const returnType = typePageQuery.get("returnTypePage");
