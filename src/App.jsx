@@ -241,7 +241,7 @@ function App() {
             <DialogContent sx={{ overflow: "hidden" }}>
               <>
                 <Box sx={{ overflow: "hidden" }} ref={filterRef}>
-                  <Box>
+                  {/* <Box>
                     <Typography
                       sx={{ padding: "8px 0px", fontWeight: "bold" }}
                       variant="body1"
@@ -298,7 +298,7 @@ function App() {
                         i18nRef.current,
                       )}
                     />
-                  </Box>
+                  </Box> */}
                   <Grid
                     container
                     direction="row"
