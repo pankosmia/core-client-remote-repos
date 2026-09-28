@@ -13,6 +13,7 @@ import {
   Grid,
   Typography,
   Stack,
+  Tooltip,
 } from "@mui/material";
 import {
   PanDownload,
@@ -51,6 +52,7 @@ function App() {
   const searchTimeoutRef = useRef(null);
   const [orgMatches, setOrgMatches] = useState([]);
   const [isDownloadingAny, setIsDownloadingAny] = useState(false);
+  console.log("🚀 ~ App ~ isDownloadingAny:", isDownloadingAny);
   const [languageLookup, setLanguageLookup] = useState([]);
 
   useEffect(() => {
@@ -312,67 +314,81 @@ function App() {
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
-                        <Autocomplete
-                          freeSolo
-                          autoComplete={false}
-                          value={inputValue || ""}
-                          options={
-                            inputValue ? combinedOptions : nameOrganisation
+                        <Tooltip
+                          title={
+                            isDownloadingAny &&
+                            doI18n(
+                              "pages:core-remote-resources:downloading",
+                              i18nRef.current,
+                            )
                           }
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && inputValue) {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleChange(inputValue);
-                              setShowTable(true);
-                            }
-                          }}
-                          getOptionLabel={(option) => option.name || option}
-                          onChange={(event, newValue) => {
-                            if (!newValue) return;
+                          placement="top"
+                        >
+                          <span style={{ flex: 1 }}>
+                            <Autocomplete
+                              freeSolo
+                              disabled={isDownloadingAny}
+                              autoComplete={false}
+                              value={inputValue || ""}
+                              options={
+                                inputValue ? combinedOptions : nameOrganisation
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && inputValue) {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleChange(inputValue);
+                                  setShowTable(true);
+                                }
+                              }}
+                              getOptionLabel={(option) => option.name || option}
+                              onChange={(event, newValue) => {
+                                if (!newValue) return;
 
-                            event?.preventDefault?.();
-                            event?.stopPropagation?.();
+                                event?.preventDefault?.();
+                                event?.stopPropagation?.();
 
-                            const value =
-                              typeof newValue === "string"
-                                ? newValue
-                                : (newValue.name ?? newValue);
+                                const value =
+                                  typeof newValue === "string"
+                                    ? newValue
+                                    : (newValue.name ?? newValue);
 
-                            setInputValue(value);
+                                setInputValue(value);
 
-                            handleChange(value);
-                            setShowTable(true);
-                          }}
-                          onInputChange={(e, newInputValue) => {
-                            setInputValue(newInputValue);
+                                handleChange(value);
+                                setShowTable(true);
+                              }}
+                              onInputChange={(e, newInputValue) => {
+                                setInputValue(newInputValue);
 
-                            if (searchTimeoutRef.current) {
-                              clearTimeout(searchTimeoutRef.current);
-                            }
+                                if (searchTimeoutRef.current) {
+                                  clearTimeout(searchTimeoutRef.current);
+                                }
 
-                            searchTimeoutRef.current = setTimeout(() => {
-                              searchUsers(newInputValue);
-                            }, 200); // ⬅️ delay in ms (adjust 300–600 is typical)
-                          }}
-                          sx={{ flex: 1 }}
-                          renderInput={(params) => (
-                            <TextField
-                              required
-                              {...params}
-                              label="Search"
-                              size="small"
-                              color="secondary"
-                              variant="outlined"
-                              helperText={doI18n(
-                                "pages:core-remote-resources:required_for_results",
-                                i18nRef.current,
+                                searchTimeoutRef.current = setTimeout(() => {
+                                  searchUsers(newInputValue);
+                                }, 200); // ⬅️ delay in ms (adjust 300–600 is typical)
+                              }}
+                              sx={{ flex: 1 }}
+                              renderInput={(params) => (
+                                <TextField
+                                  required
+                                  {...params}
+                                  label="Search"
+                                  size="small"
+                                  color="secondary"
+                                  variant="outlined"
+                                  helperText={doI18n(
+                                    "pages:core-remote-resources:required_for_results",
+                                    i18nRef.current,
+                                  )}
+                                />
                               )}
                             />
-                          )}
-                        />
+                          </span>
+                        </Tooltip>
                         <IconButton
-                          disabled={!inputValue}
+                          disabled={!inputValue || isDownloadingAny}
                           onClick={() => {
                             handleChange(inputValue);
                             setShowTable(true);
