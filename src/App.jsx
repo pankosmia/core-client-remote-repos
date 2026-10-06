@@ -52,7 +52,6 @@ function App() {
   const searchTimeoutRef = useRef(null);
   const [orgMatches, setOrgMatches] = useState([]);
   const [isDownloadingAny, setIsDownloadingAny] = useState(false);
-  console.log("🚀 ~ App ~ isDownloadingAny:", isDownloadingAny);
   const [languageLookup, setLanguageLookup] = useState([]);
 
   useEffect(() => {
