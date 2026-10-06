@@ -35,8 +35,8 @@ importers:
         specifier: ^0.0.3
         version: 0.0.3
       pankosmia-rcl:
-        specifier: 0.7.4
-        version: 0.7.4(1bfbbf07b38d15b3d4887a0aa062241b)
+        specifier: 0.7.8
+        version: 0.7.8(1bfbbf07b38d15b3d4887a0aa062241b)
       react:
         specifier: ^19.2.8
         version: 19.2.8
@@ -4076,10 +4076,10 @@ packages:
       react: ^17.0.0 || ^18.0.0
       react-dom: ^17.0.0 || ^18.0.0
 
-  pankosmia-rcl@0.7.4:
+  pankosmia-rcl@0.7.8:
     resolution:
       {
-        integrity: sha512-vFrXo/nz+P55amIG2KiA4/Muzna29TPlxjfoU6UOo3RJoGkYV3CkNne3/FlziSpEcz/hXFvnNiGim13lqOEHDQ==,
+        integrity: sha512-iaNcddycjXpoNhJSohfgrJQaPkmz/H4H6G65678SpCMlaUBJUEPm5OOvZWqFNk924IEycEqs3/Auqgv9WoEGig==,
       }
     engines: { node: ">=24", pnpm: 11.20.0 }
     peerDependencies:
@@ -7716,7 +7716,7 @@ snapshots:
       - supports-color
       - typescript
 
-  pankosmia-rcl@0.7.4(1bfbbf07b38d15b3d4887a0aa062241b):
+  pankosmia-rcl@0.7.8(1bfbbf07b38d15b3d4887a0aa062241b):
     dependencies:
       "@emotion/react": 11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
       "@emotion/styled": 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
