@@ -3,11 +3,8 @@ import App from "./App";
 import "./index.css";
 import { SpSpa } from "pankosmia-rcl";
 import { createHashRouter, RouterProvider } from "react-router-dom";
-import { ThemeProvider } from "@emotion/react";
 import { MaterialDesignContent, SnackbarProvider } from "notistack";
-import { useEffect, useState } from "react";
-import { createTheme, styled } from "@mui/material";
-import { getAndSetJson } from "pankosmia-lib/http";
+import { styled } from "@mui/material";
 
 const typePageQuery = new URLSearchParams(window.location.search);
 const returnType = typePageQuery.get("returnTypePage");
@@ -19,60 +16,6 @@ const router = createHashRouter([
 ]);
 
 function AppLayout() {
-  const [themeSpec, setThemeSpec] = useState({
-    palette: {
-      primary: {
-        main: "#666",
-      },
-      secondary: {
-        main: "#888",
-      },
-    },
-  });
-
-  useEffect(() => {
-    if (
-      themeSpec.palette &&
-      themeSpec.palette.primary &&
-      themeSpec.palette.primary.main &&
-      themeSpec.palette.primary.main === "#666"
-    ) {
-      getAndSetJson({
-        url: "/api/app-resources/themes/default.json",
-        setter: setThemeSpec,
-      }).then();
-    }
-  }, []);
-
-  const theme = createTheme(
-    {
-      components: {
-        MuiFab: {
-          styleOverrides: {
-            root: {
-              textTransform: "capitalize",
-            },
-          },
-        },
-        MuiButton: {
-          styleOverrides: {
-            root: {
-              textTransform: "capitalize",
-            },
-          },
-        },
-        MuiTab: {
-          styleOverrides: {
-            root: {
-              textTransform: "capitalize",
-            },
-          },
-        },
-      },
-    },
-    themeSpec,
-  );
-
   const CustomSnackbarContent = styled(MaterialDesignContent)(() => ({
     "&.notistack-MuiContent-error": {
       backgroundColor: "#FDEDED",
@@ -93,7 +36,7 @@ function AppLayout() {
   }));
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <SnackbarProvider
         Components={{
           error: CustomSnackbarContent,
@@ -112,7 +55,7 @@ function AppLayout() {
       >
         <RouterProvider router={router} />
       </SpSpa>
-    </ThemeProvider>
+    </>
   );
 }
 createRoot(document.getElementById("root")).render(<AppLayout />);
