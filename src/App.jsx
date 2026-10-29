@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef } from "react";
 
 import { useMemo, useState } from "react";
-import { getJson, postEmptyJson, getAndSetJson } from "pankosmia-lib/http";
+import { getJson, postEmpty, getAndSetJson } from "pankosmia-lib/http";
 import { doI18n } from "pankosmia-lib/i18n";
 import {
   DialogContent,
@@ -182,7 +182,7 @@ function App() {
         postType === "clone"
           ? `/api/git/clone-repo/${remoteRepoPath}?branch=${b.name}`
           : `/api/git/pull-repo/origin/${remoteRepoPath}`;
-      return await postEmptyJson(fetchUrl, debugRef.current);
+      return await postEmpty(fetchUrl, debugRef.current);
     }
 
     return {
